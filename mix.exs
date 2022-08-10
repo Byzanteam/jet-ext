@@ -6,6 +6,7 @@ defmodule JetExt.MixProject do
       app: :jet_ext,
       version: "0.1.0",
       elixir: "~> 1.13",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -24,4 +25,8 @@ defmodule JetExt.MixProject do
       {:ecto, "~> 3.8"}
     ]
   end
+
+  defp elixirc_paths(:prod), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "test"]
+  defp elixirc_paths(_), do: ["lib"]
 end
