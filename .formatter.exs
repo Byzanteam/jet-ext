@@ -4,6 +4,7 @@
     "{config,lib,test}/**/*.{ex,exs}"
   ],
   import_deps: [
-    :credo
+    :credo,
+    :ecto
   ]
 ]
