@@ -19,6 +19,8 @@ defmodule JetExt.MixProject do
 
   defp deps do
     [
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ecto, "~> 3.8"}
     ]
   end

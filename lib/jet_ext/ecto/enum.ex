@@ -66,7 +66,7 @@ defmodule JetExt.Ecto.Enum do
         case {@cast_mapping, @dump_mapping} do
           {%{^data => as_atom}, _} -> {:ok, as_atom}
           {_, %{^data => _}} -> {:ok, data}
-          _ -> :error
+          _otherwise -> :error
         end
       end
 
@@ -82,7 +82,7 @@ defmodule JetExt.Ecto.Enum do
         end
       end
 
-      def load(_), do: :error
+      def load(_term), do: :error
 
       @impl Ecto.Type
       def dump(nil), do: {:ok, nil}
