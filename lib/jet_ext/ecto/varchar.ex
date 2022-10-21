@@ -23,8 +23,7 @@ defmodule JetExt.Ecto.Varchar do
 
   @impl Ecto.ParameterizedType
   def init(opts) do
-    opts = validate_opts(opts)
-    Enum.into(opts, %{})
+    validate_opts(opts)
   end
 
   @default_limit 255
@@ -44,10 +43,10 @@ defmodule JetExt.Ecto.Varchar do
       raise ArgumentError, "count must be in #{inspect(@counts)}"
     end
 
-    [
+    %{
       limit: limit,
       count: count
-    ]
+    }
   end
 
   @impl Ecto.ParameterizedType
