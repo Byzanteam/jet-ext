@@ -1,5 +1,5 @@
-defmodule JetExt.Ecto.UrnTest do
+defmodule JetExt.Ecto.URNTest do
   use ExUnit.Case, async: true
 
-  doctest JetExt.Ecto.Urn, import: true
+  doctest JetExt.Ecto.URN, import: true
 end
