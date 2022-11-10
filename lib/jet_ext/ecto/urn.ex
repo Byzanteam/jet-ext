@@ -55,6 +55,9 @@ if Code.ensure_loaded?(URN) do
     def type, do: :string
 
     @impl true
+    def embed_as(_format), do: :dump
+
+    @impl true
     def cast(urn) when is_binary(urn) do
       with({:error, _reason} <- URN.parse(urn)) do
         :error

@@ -81,6 +81,9 @@ defmodule JetExt.Ecto.URI do
   def type, do: :string
 
   @impl true
+  def embed_as(_format), do: :dump
+
+  @impl true
   def cast(uri) when is_binary(uri) do
     with({:error, part} <- URI.new(uri)) do
       {:error, [part: part]}
