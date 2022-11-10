@@ -10,6 +10,7 @@ defmodule JetExt.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
+        ignore_warnings: ".dialyzer_ignore.exs",
         plt_add_apps: [:urn]
       ]
     ]
