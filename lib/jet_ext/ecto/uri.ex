@@ -81,6 +81,9 @@ defmodule JetExt.Ecto.URI do
   def type, do: :string
 
   @impl true
+  def embed_as(_format), do: :dump
+
+  @impl true
   def cast(uri) when is_binary(uri) do
     with({:error, part} <- URI.new(uri)) do
       {:error, [part: part]}
@@ -98,4 +101,14 @@ defmodule JetExt.Ecto.URI do
   @impl true
   def dump(%URI{} = uri), do: {:ok, URI.to_string(uri)}
   def dump(_data), do: :error
+
+  @impl true
+  def equal?(uri, uri), do: true
+  def equal?(nil, _uri), do: false
+  def equal?(_uri, nil), do: false
+
+  def equal?(one, another) do
+    # remove this after the `:authority` of URI struct is removed
+    URI.to_string(one) === URI.to_string(another)
+  end
 end

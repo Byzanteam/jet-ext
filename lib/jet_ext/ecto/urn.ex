@@ -55,6 +55,9 @@ if Code.ensure_loaded?(URN) do
     def type, do: :string
 
     @impl true
+    def embed_as(_format), do: :dump
+
+    @impl true
     def cast(urn) when is_binary(urn) do
       with({:error, _reason} <- URN.parse(urn)) do
         :error
@@ -74,7 +77,9 @@ if Code.ensure_loaded?(URN) do
     def dump(_data), do: :error
 
     @impl true
-    def equal?(term, term), do: true
+    def equal?(urn, urn), do: true
+    def equal?(nil, _urn), do: false
+    def equal?(_urn, nil), do: false
     def equal?(one, another), do: URN.equal?(one, another)
   end
 end
