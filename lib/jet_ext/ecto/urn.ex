@@ -77,7 +77,9 @@ if Code.ensure_loaded?(URN) do
     def dump(_data), do: :error
 
     @impl true
-    def equal?(term, term), do: true
+    def equal?(urn, urn), do: true
+    def equal?(nil, _urn), do: false
+    def equal?(_urn, nil), do: false
     def equal?(one, another), do: URN.equal?(one, another)
   end
 end
