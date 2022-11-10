@@ -8,7 +8,11 @@ defmodule JetExt.MixProject do
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        ignore_warnings: ".dialyzer_ignore.exs",
+        plt_add_apps: [:urn]
+      ]
     ]
   end
 
@@ -22,7 +26,8 @@ defmodule JetExt.MixProject do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:ecto, "~> 3.8"}
+      {:ecto, "~> 3.8"},
+      {:urn, "~> 1.0", optional: true}
     ]
   end
 
