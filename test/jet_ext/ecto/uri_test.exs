@@ -1,5 +1,5 @@
-defmodule JetExt.Ecto.UriTest do
+defmodule JetExt.Ecto.URITest do
   use ExUnit.Case, async: true
 
-  doctest JetExt.Ecto.Uri, import: true
+  doctest JetExt.Ecto.URI, import: true
 end

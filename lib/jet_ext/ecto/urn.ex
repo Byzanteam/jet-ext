@@ -1,5 +1,5 @@
 if Code.ensure_loaded?(URN) do
-  defmodule JetExt.Ecto.Urn do
+  defmodule JetExt.Ecto.URN do
     @moduledoc """
       An Ecto type for URN ([RFC 8141](https://tools.ietf.org/html/rfc8141))
 

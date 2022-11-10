@@ -1,4 +1,4 @@
-defmodule JetExt.Ecto.Uri do
+defmodule JetExt.Ecto.URI do
   @moduledoc """
   An Ecto type for URI ([RFC 3986](https://tools.ietf.org/html/rfc3986)).
 
