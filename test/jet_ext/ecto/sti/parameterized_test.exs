@@ -103,4 +103,22 @@ defmodule JetExt.Ecto.STI.ParameterizedTest do
                nil
              ])
   end
+
+  defmodule MyModule do
+    @moduledoc false
+
+    use Ecto.Schema
+
+    @primary_key false
+
+    embedded_schema do
+      field :lsp, Parameterized, intermediate_module: LSP.IntermediateModule
+      field :lsps, {:array, Parameterized}, intermediate_module: LSP.IntermediateModule
+    end
+  end
+
+  test "intermediate_module reflection" do
+    assert LSP.IntermediateModule === Parameterized.intermediate_module(MyModule, :lsp)
+    assert LSP.IntermediateModule === Parameterized.intermediate_module(MyModule, :lsps)
+  end
 end

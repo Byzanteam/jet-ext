@@ -48,4 +48,24 @@ defmodule JetExt.Ecto.STI.Parameterized do
   def cast(value, %{intermediate_module: intermediate_module}) do
     Builder.__cast__(intermediate_module, value)
   end
+
+  @spec intermediate_module(Ecto.Schema.t(), atom()) :: module()
+  def intermediate_module(schema, field) do
+    schema.__changeset__()
+  rescue
+    _error in UndefinedFunctionError ->
+      raise ArgumentError, "#{inspect(schema)} is not an Ecto schema"
+  else
+    %{^field => {:parameterized, __MODULE__, %{intermediate_module: intermediate_module}}} ->
+      intermediate_module
+
+    %{^field => {_, {:parameterized, __MODULE__, %{intermediate_module: intermediate_module}}}} ->
+      intermediate_module
+
+    %{^field => _} ->
+      raise ArgumentError, "#{field} is not an #{inspect(__MODULE__)} field"
+
+    %{} ->
+      raise ArgumentError, "#{field} does not exist"
+  end
 end
