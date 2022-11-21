@@ -1,13 +1,13 @@
-defmodule JetExt.Ecto.STI.ParameterizedTest do
+defmodule JetExt.Ecto.STITest do
   use ExUnit.Case
 
-  alias JetExt.Ecto.STI.Parameterized
+  alias JetExt.Ecto.STI
   alias JetExt.Ecto.STI.Support.LSP
 
   @ecto_type {
     :parameterized,
-    Parameterized,
-    Parameterized.init(intermediate_module: LSP.IntermediateModule)
+    STI,
+    STI.init(intermediate_module: LSP.IntermediateModule)
   }
 
   describe "cast" do
@@ -112,13 +112,13 @@ defmodule JetExt.Ecto.STI.ParameterizedTest do
     @primary_key false
 
     embedded_schema do
-      field :lsp, Parameterized, intermediate_module: LSP.IntermediateModule
-      field :lsps, {:array, Parameterized}, intermediate_module: LSP.IntermediateModule
+      field :lsp, STI, intermediate_module: LSP.IntermediateModule
+      field :lsps, {:array, STI}, intermediate_module: LSP.IntermediateModule
     end
   end
 
   test "intermediate_module reflection" do
-    assert LSP.IntermediateModule === Parameterized.intermediate_module(MyModule, :lsp)
-    assert LSP.IntermediateModule === Parameterized.intermediate_module(MyModule, :lsps)
+    assert LSP.IntermediateModule === STI.intermediate_module(MyModule, :lsp)
+    assert LSP.IntermediateModule === STI.intermediate_module(MyModule, :lsps)
   end
 end

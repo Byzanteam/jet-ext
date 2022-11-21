@@ -1,9 +1,9 @@
-defmodule JetExt.Ecto.STI.Parameterized do
+defmodule JetExt.Ecto.STI do
   @moduledoc """
   The parameterized STI type.
 
   ```
-    field :bar, JetExt.Ecto.STI.Parameterized, intermediate_module: MyIntermediaModule
+    field :bar, JetExt.Ecto.STI, intermediate_module: MyIntermediaModule
   ```
   """
 
