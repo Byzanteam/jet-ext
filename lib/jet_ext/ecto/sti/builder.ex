@@ -19,8 +19,6 @@ defmodule JetExt.Ecto.STI.Builder do
 
       use Ecto.Type
 
-      @type t() :: struct()
-
       @impl Ecto.Type
       def type, do: :map
 
@@ -45,39 +43,39 @@ defmodule JetExt.Ecto.STI.Builder do
   end
 
   defmacro __before_compile__(env) do
-    unless Module.defines_type?(env.module, {:t, 0}) do
-      raise ArgumentError, """
-      The `:t` type is not defined.
-
-      ## Example:
-
-          @type t() :: %__MODULE__{}
-      """
-    end
-
-    quote location: :keep do
-      @spec load!(map()) :: t()
-      def load!(params) do
-        case load(params) do
-          {:ok, data} ->
-            data
-
-          :error ->
-            raise RuntimeError, "Cannot load #{inspect(params)} for #{inspect(__MODULE__)}."
+    type_t =
+      unless Module.defines_type?(env.module, {:t, 0}) do
+        quote do
+          @type t() :: struct()
         end
       end
 
-      @spec dump!(t()) :: map()
-      def dump!(data) do
-        case dump(data) do
-          {:ok, params} ->
-            params
+    bang_methods =
+      quote location: :keep do
+        @spec load!(map()) :: t()
+        def load!(params) do
+          case load(params) do
+            {:ok, data} ->
+              data
 
-          :error ->
-            raise RuntimeError, "Cannot dump #{inspect(data)} for #{inspect(__MODULE__)}."
+            :error ->
+              raise RuntimeError, "Cannot load #{inspect(params)} for #{inspect(__MODULE__)}."
+          end
+        end
+
+        @spec dump!(t()) :: map()
+        def dump!(data) do
+          case dump(data) do
+            {:ok, params} ->
+              params
+
+            :error ->
+              raise RuntimeError, "Cannot dump #{inspect(data)} for #{inspect(__MODULE__)}."
+          end
         end
       end
-    end
+
+    [type_t, bang_methods]
   end
 
   @doc false
