@@ -77,6 +77,8 @@ defmodule JetExt.Ecto.URI do
 
   use Ecto.Type
 
+  @type t() :: URI.t()
+
   @impl true
   def type, do: :string
 

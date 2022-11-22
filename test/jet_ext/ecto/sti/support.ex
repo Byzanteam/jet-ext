@@ -119,6 +119,4 @@ defmodule JetExt.Ecto.STI.Support.LSP do
 
   use JetExt.Ecto.STI.Builder,
     intermediate_module: JetExt.Ecto.STI.Support.LSP.IntermediateModule
-
-  @type t() :: term()
 end

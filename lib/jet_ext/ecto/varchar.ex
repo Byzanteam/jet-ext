@@ -18,6 +18,8 @@ defmodule JetExt.Ecto.Varchar do
 
   use Ecto.ParameterizedType
 
+  @type t() :: binary()
+
   @impl Ecto.ParameterizedType
   def type(_params), do: :string
 

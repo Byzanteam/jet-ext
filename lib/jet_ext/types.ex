@@ -3,6 +3,8 @@ defmodule JetExt.Types do
   Define types that used in the jet projects.
   """
 
+  @type maybe(t) :: t | nil
+
   @doc """
   Make (sum type)[https://en.wikipedia.org/wiki/Tagged_union].
     iex> JetExt.Types.make_sum_type([:foo, :bar, :baz])
