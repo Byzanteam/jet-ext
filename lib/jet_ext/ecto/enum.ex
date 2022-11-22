@@ -27,6 +27,8 @@ defmodule JetExt.Ecto.Enum do
     {:ok, "FOO"}
   """
 
+  @type t() :: atom()
+
   defmacro __using__(values) do
     quote location: :keep, bind_quoted: [values: values] do
       unless is_list(values) and Enum.all?(values, &is_atom/1) do

@@ -19,6 +19,8 @@ defmodule JetExt.Ecto.STI.Builder do
 
       use Ecto.Type
 
+      @type t() :: struct()
+
       @impl Ecto.Type
       def type, do: :map
 

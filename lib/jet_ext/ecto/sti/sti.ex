@@ -11,6 +11,8 @@ defmodule JetExt.Ecto.STI do
 
   alias JetExt.Ecto.STI.Builder
 
+  @type t() :: struct()
+
   defstruct [
     :intermediate_module
   ]

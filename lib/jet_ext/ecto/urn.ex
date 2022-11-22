@@ -51,6 +51,8 @@ if Code.ensure_loaded?(URN) do
 
     use Ecto.Type
 
+    @type t() :: URN.t()
+
     @impl true
     def type, do: :string
 
