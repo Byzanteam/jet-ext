@@ -2,6 +2,25 @@ defmodule JetExt.Ecto.Enum do
   @moduledoc """
   Defining an Enum Ecto type.
 
+  ## Parameterized Type
+
+    ```elixir
+    iex> type = Ecto.ParameterizedType.init(JetExt.Ecto.Enum, values: [:foo, :bar])
+    {
+      :parameterized,
+      JetExt.Ecto.Enum,
+      %{
+        mappings: [foo: "foo", bar: "bar"],
+        on_cast: %{"FOO" => :foo, "BAR" => :bar, "foo" => :foo, "bar" => :bar},
+        on_dump: %{foo: "FOO", bar: "BAR"},
+        on_load: %{"FOO" => :foo, "BAR" => :bar},
+        type: :string
+      }
+    }
+    ```
+
+  ## Type Module
+
     ```elixir
     defmodule EnumType do
       use JetExt.Ecto.Enum, [:foo, :bar, :baz]
@@ -27,7 +46,71 @@ defmodule JetExt.Ecto.Enum do
     {:ok, "FOO"}
   """
 
+  use Ecto.ParameterizedType
+
   @type t() :: atom()
+
+  @impl true
+  def init(opts) do
+    case Ecto.Enum.init(opts) do
+      %{type: :integer} = params ->
+        params
+
+      %{type: :string} = params ->
+        params
+        |> Map.update!(
+          :on_cast,
+          &Enum.reduce(&1, &1, fn {data, value}, on_cast ->
+            Map.put(on_cast, String.upcase(data), value)
+          end)
+        )
+        |> Map.update!(
+          :on_dump,
+          &Map.new(&1, fn {value, data} -> {value, String.upcase(data)} end)
+        )
+        |> Map.update!(
+          :on_load,
+          &Map.new(&1, fn {data, value} -> {String.upcase(data), value} end)
+        )
+    end
+  end
+
+  @impl true
+  def type(params), do: params.type
+
+  @impl true
+  defdelegate cast(data, params), to: Ecto.Enum
+
+  @impl true
+  defdelegate dump(data, dumper, params), to: Ecto.Enum
+
+  @impl true
+  defdelegate load(data, loader, params), to: Ecto.Enum
+
+  @impl true
+  defdelegate embed_as(format, params), to: Ecto.Enum
+
+  @doc "Returns the possible dump values for a given schema and field"
+  @spec dump_values(module(), atom()) :: [String.t()] | [integer()]
+  def dump_values(schema, field) do
+    schema
+    |> fetch_parameter!(field, :on_dump)
+    |> Map.values()
+  end
+
+  @doc "Returns the mappings for a given schema and field"
+  @spec mappings(module(), atom()) :: Keyword.t()
+  def mappings(schema, field) do
+    fetch_parameter!(schema, field, :mappings)
+  end
+
+  @doc "Returns the possible values for a given schema and field"
+  @spec values(module, atom) :: [atom()]
+  def values(schema, field) do
+    schema
+    |> mappings(field)
+    |> Keyword.keys()
+  end
 
   defmacro __using__(values) do
     quote location: :keep, bind_quoted: [values: values] do
@@ -128,5 +211,17 @@ defmodule JetExt.Ecto.Enum do
         end
       end
     end
+  end
+
+  defp fetch_parameter!(schema, field, name) do
+    schema.__changeset__()
+  rescue
+    _exception in UndefinedFunctionError ->
+      raise ArgumentError, "#{inspect(schema)} is not an Ecto schema"
+  else
+    %{^field => {:parameterized, __MODULE__, %{^name => value}}} -> value
+    %{^field => {_, {:parameterized, __MODULE__, %{^name => value}}}} -> value
+    %{^field => _} -> raise ArgumentError, "#{field} is not an #{__MODULE__} field"
+    %{} -> raise ArgumentError, "#{field} does not exist"
   end
 end
