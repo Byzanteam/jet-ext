@@ -41,6 +41,16 @@ defmodule JetExt.Naming do
       def modules, do: @modules
 
       @impl JetExt.Naming
+      def resolve_module(token) when is_binary(token) do
+        token
+        |> Macro.underscore()
+        |> String.to_existing_atom()
+        |> resolve_module()
+      rescue
+        _exception in ArgumentError ->
+          :error
+      end
+
       for {token, module} <- @token_modules do
         def resolve_module(unquote(token)), do: {:ok, unquote(module)}
       end

@@ -5,24 +5,68 @@ defmodule JetExt.Ecto.EnumTest do
     use JetExt.Ecto.Enum, [:foo, :bar]
   end
 
-  test "cast/1" do
-    assert EnumType.cast("foo") === {:ok, :foo}
-    assert EnumType.cast("FOO") === {:ok, :foo}
-    assert EnumType.cast(:foo) === {:ok, :foo}
+  defmodule ParameterizedSchema do
+    use Ecto.Schema
 
-    assert EnumType.cast(:baz) === :error
+    embedded_schema do
+      field :type, JetExt.Ecto.Enum, values: [:foo, :bar]
+    end
   end
 
-  test "load/1" do
-    assert EnumType.load("foo") === {:ok, :foo}
-    assert EnumType.load("FOO") === {:ok, :foo}
+  describe "module type" do
+    test "cast/1" do
+      assert EnumType.cast("foo") === {:ok, :foo}
+      assert EnumType.cast("FOO") === {:ok, :foo}
+      assert EnumType.cast(:foo) === {:ok, :foo}
 
-    assert EnumType.load("baz") === :error
+      assert EnumType.cast(:baz) === :error
+    end
+
+    test "dump/1" do
+      assert EnumType.dump(:foo) === {:ok, "FOO"}
+
+      assert EnumType.dump(:baz) === :error
+    end
+
+    test "load/1" do
+      assert EnumType.load("foo") === {:ok, :foo}
+      assert EnumType.load("FOO") === {:ok, :foo}
+
+      assert EnumType.load("baz") === :error
+    end
   end
 
-  test "dump/1" do
-    assert EnumType.dump(:foo) === {:ok, "FOO"}
+  describe "parameterized type" do
+    setup do
+      [type: Ecto.ParameterizedType.init(JetExt.Ecto.Enum, values: [:foo, :bar, :baz])]
+    end
 
-    assert EnumType.dump(:baz) === :error
+    test "cast/2", %{type: type} do
+      assert {:ok, :foo} = Ecto.Type.cast(type, :foo)
+      assert {:ok, :bar} = Ecto.Type.cast(type, "bar")
+      assert {:ok, :baz} = Ecto.Type.cast(type, "BAZ")
+    end
+
+    test "dump/2", %{type: type} do
+      assert {:ok, "FOO"} = Ecto.Type.dump(type, :foo)
+      assert :error = Ecto.Type.dump(type, :baa)
+    end
+
+    test "load/2", %{type: type} do
+      assert {:ok, :foo} = Ecto.Type.load(type, "FOO")
+      assert :error = Ecto.Type.load(type, "foo")
+    end
+
+    test "dump_values/2" do
+      assert ["BAR", "FOO"] = JetExt.Ecto.Enum.dump_values(ParameterizedSchema, :type)
+    end
+
+    test "mappings/2" do
+      assert [foo: "foo", bar: "bar"] = JetExt.Ecto.Enum.mappings(ParameterizedSchema, :type)
+    end
+
+    test "values/2" do
+      assert [:foo, :bar] = JetExt.Ecto.Enum.values(ParameterizedSchema, :type)
+    end
   end
 end
