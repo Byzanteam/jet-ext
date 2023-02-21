@@ -196,16 +196,12 @@ defmodule JetExt.Map do
   def indifferent_take(%{} = map, keys) when is_list(keys) do
     unless Enum.all?(keys, &is_atom/1), do: raise(KeyError, "key must be an atom")
 
-    for key <- keys, reduce: %{} do
-      acc ->
-        str_key = Atom.to_string(key)
+    keys =
+      Enum.reduce(keys, [], fn key, acc ->
+        if is_map_key(map, key), do: [key | acc], else: [Atom.to_string(key) | acc]
+      end)
 
-        case map do
-          %{^key => value} -> Map.put(acc, key, value)
-          %{^str_key => value} -> Map.put(acc, str_key, value)
-          _other -> acc
-        end
-    end
+    Map.take(map, keys)
   end
 
   @doc """
