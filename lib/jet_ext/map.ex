@@ -73,9 +73,7 @@ defmodule JetExt.Map do
     Enum.map(data, &recursive_atomize_keys(&1))
   end
 
-  def recursive_atomize_keys(%_struct{} = data), do: data
-
-  def recursive_atomize_keys(%{} = data) do
+  def recursive_atomize_keys(%{} = data) when not is_struct(data) do
     for {key, value} <- data, into: %{} do
       key =
         cond do
