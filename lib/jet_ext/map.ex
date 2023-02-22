@@ -217,13 +217,21 @@ defmodule JetExt.Map do
     :error
   """
   @spec indifferent_has_key(map(), key :: atom()) :: {:ok, binary() | atom()} | :error
-  def indifferent_has_key(%{} = map, key) when is_atom(key) do
+  def indifferent_has_key(map, key) when is_atom(key) do
     str_key = Atom.to_string(key)
 
-    cond do
-      is_map_key(map, key) -> {:ok, key}
-      is_map_key(map, str_key) -> {:ok, str_key}
-      true -> :error
+    case map do
+      %{^key => _value} ->
+        {:ok, key}
+
+      %{^str_key => _value} ->
+        {:ok, str_key}
+
+      %{} ->
+        :error
+
+      other ->
+        :erlang.error({:badmap, other}, [map, key])
     end
   end
 
