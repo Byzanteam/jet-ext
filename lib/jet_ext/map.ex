@@ -184,24 +184,22 @@ defmodule JetExt.Map do
   ## Example
 
     iex> JetExt.Map.indifferent_take(%{"a" => 1, "b" => 2, c: 3, d: 4}, [:a, :b, :c])
-    %{"a" => 1, "b" => 2, c: 3}
+    %{a: 1, b: 2, c: 3}
 
     iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:a])
-    %{"a" => 1}
+    %{a: 1}
 
     iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:b])
     %{}
   """
   @spec indifferent_take(map(), keys :: [atom()]) :: map()
   def indifferent_take(%{} = map, keys) when is_list(keys) do
-    unless Enum.all?(keys, &is_atom/1), do: raise(KeyError, "key must be an atom")
-
-    keys =
-      Enum.reduce(keys, [], fn key, acc ->
-        if is_map_key(map, key), do: [key | acc], else: [Atom.to_string(key) | acc]
-      end)
-
-    Map.take(map, keys)
+    Enum.reduce(keys, %{}, fn k, acc ->
+      case indifferent_fetch(map, k) do
+        {:ok, v} -> Map.put(acc, k, v)
+        :error -> acc
+      end
+    end)
   end
 
   @doc """
