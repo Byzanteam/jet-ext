@@ -193,7 +193,9 @@ defmodule JetExt.Map do
     %{}
   """
   @spec indifferent_take(map(), keys :: [atom()]) :: map()
-  def indifferent_take(%{} = map, keys) when is_list(keys) do
+  def indifferent_take(map, keys) when is_list(keys) do
+    unless is_map(map), do: :erlang.error({:badmap, map}, [map, keys])
+
     Enum.reduce(keys, %{}, fn k, acc ->
       case indifferent_fetch(map, k) do
         {:ok, v} -> Map.put(acc, k, v)
