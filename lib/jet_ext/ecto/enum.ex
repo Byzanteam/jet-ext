@@ -195,7 +195,7 @@ defmodule JetExt.Ecto.Enum do
         end
       end
 
-      @spec load!(data :: term()) :: t()
+      @spec load!(data :: term()) :: t() | nil
       def load!(data) do
         case load(data) do
           {:ok, value} -> value
