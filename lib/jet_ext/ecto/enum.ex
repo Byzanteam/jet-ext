@@ -203,7 +203,7 @@ defmodule JetExt.Ecto.Enum do
         end
       end
 
-      @spec dump!(data :: t()) :: map() | nil
+      @spec dump!(data :: t()) :: String.t() | nil
       def dump!(data) do
         case dump(data) do
           {:ok, value} -> value
