@@ -184,7 +184,7 @@ defmodule JetExt.Ecto.Enum do
       def embed_as(_data), do: :dump
 
       # Reflections
-      @spec __values__() :: [t()]
+      @spec __values__() :: [t(), ...]
       def __values__, do: unquote(values)
 
       @spec cast!(data :: term()) :: t()
@@ -195,7 +195,7 @@ defmodule JetExt.Ecto.Enum do
         end
       end
 
-      @spec load!(data :: term()) :: t()
+      @spec load!(data :: term()) :: t() | nil
       def load!(data) do
         case load(data) do
           {:ok, value} -> value
@@ -203,7 +203,7 @@ defmodule JetExt.Ecto.Enum do
         end
       end
 
-      @spec dump!(data :: t()) :: map() | nil
+      @spec dump!(data :: t()) :: String.t() | nil
       def dump!(data) do
         case dump(data) do
           {:ok, value} -> value
