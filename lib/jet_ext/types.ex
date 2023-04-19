@@ -5,6 +5,20 @@ defmodule JetExt.Types do
 
   @type maybe(t) :: t | nil
 
+  @typedoc """
+  Used to declare the key of a `Keyword` as mandatory.
+
+  NOTE: It can only be used on the type of the value.
+
+  ```elixir
+  @type options() :: [
+    required_key: as_required(boolean()),
+    optional_key: boolean()
+  ]
+  ```
+  """
+  @type as_required(t) :: t
+
   @doc """
   Make (sum type)[https://en.wikipedia.org/wiki/Tagged_union].
     iex> JetExt.Types.make_sum_type([:foo, :bar, :baz])
