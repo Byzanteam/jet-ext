@@ -4,33 +4,31 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
   alias JetExt.Absinthe.Relay.Connection.Config
   alias JetExt.Absinthe.Relay.Connection.Query
 
-  defmodule Post do
+  defmodule User do
     use Ecto.Schema
 
-    schema "posts" do
-      field :title, :string
-      field :content, :string
-
-      timestamps()
+    schema "users" do
+      field :age, :integer
+      field :name, :string
     end
   end
 
   test "works" do
     config =
       Config.new(
-        after: %{inserted_at: DateTime.utc_now(), title: "title"},
+        after: %{age: 20, name: "Alice"},
         direction: :forward,
-        cursor_fields: [inserted_at: :asc, title: :asc]
+        cursor_fields: [age: :asc, name: :asc]
       )
 
     assert %Ecto.Query{
-             from: %{source: {"posts", Post}},
+             from: %{source: {"users", User}},
              limit: %{params: [{51, :integer}]},
              order_bys: [
                %{
                  expr: [
-                   asc: {{:., [], [{:&, [], [0]}, :inserted_at]}, [], []},
-                   asc: {{:., [], [{:&, [], [0]}, :title]}, [], []}
+                   asc: {{:., [], [{:&, [], [0]}, :age]}, [], []},
+                   asc: {{:., [], [{:&, [], [0]}, :name]}, [], []}
                  ]
                }
              ],
@@ -40,17 +38,17 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
                    :or,
                    [],
                    [
-                     {:>, [], [{{:., [], [{:&, [], [0]}, :inserted_at]}, [], []}, {:^, [], [0]}]},
+                     {:>, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [0]}]},
                      {:and, [],
                       [
-                        {:>, [], [{{:., [], [{:&, [], [0]}, :title]}, [], []}, {:^, [], [1]}]},
-                        {:==, [],
-                         [{{:., [], [{:&, [], [0]}, :inserted_at]}, [], []}, {:^, [], [2]}]}
+                        {:>, [], [{{:., [], [{:&, [], [0]}, :name]}, [], []}, {:^, [], [1]}]},
+                        {:==, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [2]}]}
                       ]}
                    ]
-                 }
+                 },
+                 params: [{20, {0, :age}}, {"Alice", {0, :name}}, {20, {0, :age}}]
                }
              ]
-           } = Query.paginate(Post, config)
+           } = Query.paginate(User, config)
   end
 end
