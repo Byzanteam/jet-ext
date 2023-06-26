@@ -50,7 +50,7 @@ defmodule JetExt.Ecto.Enum do
 
   @type t() :: atom()
 
-  @impl true
+  @impl Ecto.ParameterizedType
   def init(opts) do
     case Ecto.Enum.init(opts) do
       %{type: :integer} = params ->
@@ -75,19 +75,19 @@ defmodule JetExt.Ecto.Enum do
     end
   end
 
-  @impl true
+  @impl Ecto.ParameterizedType
   def type(params), do: params.type
 
-  @impl true
+  @impl Ecto.ParameterizedType
   defdelegate cast(data, params), to: Ecto.Enum
 
-  @impl true
+  @impl Ecto.ParameterizedType
   defdelegate dump(data, dumper, params), to: Ecto.Enum
 
-  @impl true
+  @impl Ecto.ParameterizedType
   defdelegate load(data, loader, params), to: Ecto.Enum
 
-  @impl true
+  @impl Ecto.ParameterizedType
   defdelegate embed_as(format, params), to: Ecto.Enum
 
   @doc "Returns the possible dump values for a given schema and field"

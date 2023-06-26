@@ -29,7 +29,7 @@ defmodule JetExt.Ecto.STI.Changeset do
 
         Code.ensure_loaded!(module)
 
-        validator = fn value -> apply(validator, [field, value]) end
+        validator = fn value -> validator.(field, value) end
 
         case {cardinality, do_validate_change(cardinality, value, validator)} do
           {:one, errors} when errors === %{} ->
@@ -58,7 +58,7 @@ defmodule JetExt.Ecto.STI.Changeset do
   end
 
   defp do_validate_change(:one, value, validator) do
-    apply(validator, [value])
+    validator.(value)
   end
 
   defp do_validate_change(:many, values, validator) do

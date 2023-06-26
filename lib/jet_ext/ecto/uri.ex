@@ -79,13 +79,13 @@ defmodule JetExt.Ecto.URI do
 
   @type t() :: URI.t()
 
-  @impl true
+  @impl Ecto.Type
   def type, do: :string
 
-  @impl true
+  @impl Ecto.Type
   def embed_as(_format), do: :dump
 
-  @impl true
+  @impl Ecto.Type
   def cast(uri) when is_binary(uri) do
     with({:error, part} <- URI.new(uri)) do
       {:error, [part: part]}
@@ -95,16 +95,16 @@ defmodule JetExt.Ecto.URI do
   def cast(%URI{} = uri), do: {:ok, uri}
   def cast(_data), do: :error
 
-  @impl true
+  @impl Ecto.Type
   def load(data) when is_binary(data), do: cast(data)
   def load(%URI{} = uri), do: {:ok, uri}
   def load(_data), do: :error
 
-  @impl true
+  @impl Ecto.Type
   def dump(%URI{} = uri), do: {:ok, URI.to_string(uri)}
   def dump(_data), do: :error
 
-  @impl true
+  @impl Ecto.Type
   def equal?(uri, uri), do: true
   def equal?(nil, _uri), do: false
   def equal?(_uri, nil), do: false

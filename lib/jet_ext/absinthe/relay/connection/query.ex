@@ -86,6 +86,7 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
       cursor_fields
       |> Enum.reduce([], fn {field, _direction}, acc ->
         case Map.fetch(values, field) do
+          # credo:disable-for-next-line Credo.Check.Refactor.NegatedIsNil
           {:ok, value} when not is_nil(value) -> [{field, value} | acc]
           _otherwise -> acc
         end

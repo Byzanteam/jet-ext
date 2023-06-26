@@ -53,13 +53,13 @@ if Code.ensure_loaded?(URN) do
 
     @type t() :: URN.t()
 
-    @impl true
+    @impl Ecto.Type
     def type, do: :string
 
-    @impl true
+    @impl Ecto.Type
     def embed_as(_format), do: :dump
 
-    @impl true
+    @impl Ecto.Type
     def cast(urn) when is_binary(urn) do
       with({:error, _reason} <- URN.parse(urn)) do
         :error
@@ -69,16 +69,16 @@ if Code.ensure_loaded?(URN) do
     def cast(%URN{} = urn), do: {:ok, urn}
     def cast(_data), do: :error
 
-    @impl true
+    @impl Ecto.Type
     def load(data) when is_binary(data), do: cast(data)
     def load(%URN{} = urn), do: {:ok, urn}
     def load(_data), do: :error
 
-    @impl true
+    @impl Ecto.Type
     def dump(%URN{} = urn), do: {:ok, URN.to_string(urn)}
     def dump(_data), do: :error
 
-    @impl true
+    @impl Ecto.Type
     def equal?(urn, urn), do: true
     def equal?(nil, _urn), do: false
     def equal?(_urn, nil), do: false
