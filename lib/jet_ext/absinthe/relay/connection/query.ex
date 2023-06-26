@@ -72,21 +72,24 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
     from(query, where: ^wheres)
   end
 
-  defp get_operator(:asc, :before), do: :lt
-  defp get_operator(:desc, :before), do: :gt
-  defp get_operator(:asc, :after), do: :gt
-  defp get_operator(:desc, :after), do: :lt
+  defp get_operator("asc" <> _tail, :before), do: :lt
+  defp get_operator("desc" <> _tail, :before), do: :gt
+  defp get_operator("asc" <> _tail, :after), do: :gt
+  defp get_operator("desc" <> _tail, :after), do: :lt
 
   defp get_operator(direction, _cursor),
-    do: raise("Invalid sorting value :#{direction}, please use either :asc or :desc")
+    do:
+      raise("""
+      Invalid sorting value :#{direction},
+      please use :asc, :asc_nulls_last, :asc_nulls_first, :desc, :desc_nulls_last, :desc_nulls_first
+      """)
 
   defp get_operator_for_field(cursor_fields, key, direction) do
-    {_, order} =
-      Enum.find(cursor_fields, fn {field_key, _order} ->
-        field_key == key
-      end)
-
-    get_operator(order, direction)
+    cursor_fields
+    |> Enum.find_value(fn {field_key, order} ->
+      if field_key === key, do: Atom.to_string(order)
+    end)
+    |> get_operator(direction)
   end
 
   defp filter_values(cursor_fields, values, cursor_direction, config) do
