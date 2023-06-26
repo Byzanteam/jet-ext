@@ -1,9 +1,11 @@
 defmodule JetExt.Absinthe.Relay.Connection do
   @moduledoc false
 
-  alias JetExt.Absinthe.Relay.Connection.{Config, Cursor, Query}
-
   require Logger
+
+  alias JetExt.Absinthe.Relay.Connection.Config
+  alias JetExt.Absinthe.Relay.Connection.Cursor
+  alias JetExt.Absinthe.Relay.Connection.Query
 
   @doc """
   Build a cursor_based connection from an Ecto Query
@@ -171,6 +173,7 @@ defmodule JetExt.Absinthe.Relay.Connection do
          _default
        )
        when not is_nil(after_cursor) do
+    # credo:disable-for-previous-line Credo.Check.Refactor.NegatedIsNil
     {:ok, cursor} =
       if is_nil(start_cursor) do
         {:ok, after_cursor}
@@ -193,6 +196,7 @@ defmodule JetExt.Absinthe.Relay.Connection do
          _default
        )
        when not is_nil(before_cursor) do
+    # credo:disable-for-previous-line Credo.Check.Refactor.NegatedIsNil
     {:ok, cursor} =
       if is_nil(end_cursor) do
         {:ok, before_cursor}
