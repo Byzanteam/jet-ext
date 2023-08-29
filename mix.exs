@@ -11,7 +11,7 @@ defmodule JetExt.MixProject do
       deps: deps(),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore.exs",
-        plt_add_apps: [:urn]
+        plt_add_apps: [:urn, :plug]
       ]
     ]
   end
@@ -26,6 +26,7 @@ defmodule JetExt.MixProject do
     [
       {:ecto, "~> 3.8"},
       {:urn, "~> 1.0", optional: true},
+      {:plug, "~> 1.14", optional: true},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
