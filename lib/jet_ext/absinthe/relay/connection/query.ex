@@ -8,7 +8,7 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
   @spec paginate(Ecto.Queryable.t(), Config.t()) :: Ecto.Queryable.t()
   def paginate(queryable, %Config{} = config) do
     queryable
-    |> select_merge([q], map(q, ^Keyword.keys(config.cursor_fields)))
+    |> select_merge([q], ^Keyword.keys(config.cursor_fields))
     |> order_query(config)
     |> maybe_where(config)
     |> limit(^query_limit(config))
