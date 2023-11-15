@@ -8,8 +8,8 @@ on:
     branches:
       - main
 env:
-  OTP_VERSION: 25.0
-  ELIXIR_VERSION: 1.14.0-otp-25
+  OTP_VERSION: 26.0
+  ELIXIR_VERSION: 1.14.5-otp-26
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
