@@ -24,7 +24,7 @@ defmodule JetExt.MixProject do
 
   defp deps do
     [
-      {:ecto, "~> 3.8"},
+      {:ecto, ">= 3.9.5 and < 4.0.0"},
       {:urn, "~> 1.0", optional: true},
       {:plug, "~> 1.14", optional: true},
       {:absinthe, "~> 1.7", optional: true},
@@ -34,6 +34,6 @@ defmodule JetExt.MixProject do
   end
 
   defp elixirc_paths(:prod), do: ["lib"]
-  defp elixirc_paths(:test), do: ["lib", "test"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 end

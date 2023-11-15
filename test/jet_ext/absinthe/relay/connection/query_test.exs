@@ -21,35 +21,12 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
         cursor_fields: [age: :asc, name: :asc]
       )
 
-    assert %Ecto.Query{
-             from: %{source: {"users", User}},
-             limit: %{params: [{51, :integer}]},
-             order_bys: [
-               %{
-                 expr: [
-                   asc: {{:., [], [{:&, [], [0]}, :age]}, [], []},
-                   asc: {{:., [], [{:&, [], [0]}, :name]}, [], []}
-                 ]
-               }
-             ],
-             wheres: [
-               %{
-                 expr: {
-                   :or,
-                   [],
-                   [
-                     {:>, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [0]}]},
-                     {:and, [],
-                      [
-                        {:>, [], [{{:., [], [{:&, [], [0]}, :name]}, [], []}, {:^, [], [1]}]},
-                        {:==, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [2]}]}
-                      ]}
-                   ]
-                 },
-                 params: [{20, {0, :age}}, {"Alice", {0, :name}}, {20, {0, :age}}]
-               }
-             ]
-           } = Query.paginate(User, config)
+    assert expr(Query.paginate(User, config)) ===
+             ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User,} <>
+               ~s{ where: u0.age > ^20} <>
+               ~s{ or (u0.name > ^"Alice" and u0.age == ^20),} <>
+               ~s{ order_by: [asc: u0.age, asc: u0.name],} <>
+               ~s{ limit: ^51,} <> ~s{ select: [:age, :name, :id]>}
   end
 
   test "works with include_head_edge and include_tail_edge" do
@@ -63,44 +40,13 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
         include_tail_edge: true
       )
 
-    assert %Ecto.Query{
-             from: %{source: {"users", User}},
-             limit: %{params: [{51, :integer}]},
-             order_bys: [
-               %{
-                 expr: [
-                   asc: {{:., [], [{:&, [], [0]}, :age]}, [], []}
-                 ]
-               }
-             ],
-             wheres: [
-               %{
-                 expr: {
-                   :or,
-                   [],
-                   [
-                     {
-                       :or,
-                       [],
-                       [
-                         {:==, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [0]}]},
-                         {:==, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [1]}]}
-                       ]
-                     },
-                     {
-                       :and,
-                       [],
-                       [
-                         {:>, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [2]}]},
-                         {:<, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [3]}]}
-                       ]
-                     }
-                   ]
-                 },
-                 params: [{20, {0, :age}}, {60, {0, :age}}, {20, {0, :age}}, {60, {0, :age}}]
-               }
-             ]
-           } = Query.paginate(User, config)
+    assert expr(Query.paginate(User, config)) ===
+             ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User,} <>
+               ~s{ where: u0.age == ^20} <>
+               ~s{ or u0.age == ^60} <>
+               ~s{ or (u0.age > ^20 and u0.age < ^60),} <>
+               ~s{ order_by: [asc: u0.age],} <>
+               ~s{ limit: ^51,} <> ~s{ select: [:age, :id, :name]>}
   end
 
   test "works with include_head_edge and include_tail_edge, nil values" do
@@ -114,80 +60,17 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
         include_tail_edge: true
       )
 
-    assert %Ecto.Query{
-             from: %{source: {"users", User}},
-             limit: %{params: [{51, :integer}]},
-             order_bys: [
-               %{
-                 expr: [
-                   asc: {{:., [], [{:&, [], [0]}, :age]}, [], []}
-                 ]
-               }
-             ],
-             wheres: [
-               %{
-                 expr: {
-                   :or,
-                   [],
-                   [
-                     # side edges
-                     {
-                       :or,
-                       [],
-                       [
-                         # head
-                         {
-                           :and,
-                           [],
-                           [
-                             {
-                               :==,
-                               [],
-                               [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [0]}]
-                             },
-                             {:is_nil, [], [{{:., [], [{:&, [], [0]}, :name]}, [], []}]}
-                           ]
-                         },
+    assert expr(Query.paginate(User, config)) ===
+             ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User, } <>
+               ~s{where: (is_nil(u0.name) and u0.age == ^20)} <>
+               ~s{ or (u0.name == ^"Alice" and u0.age == ^60)} <>
+               ~s{ or\n  (u0.age > ^20 and u0.age < ^60),} <>
+               ~s{ order_by: [asc: u0.age],} <>
+               ~s{ limit: ^51,} <>
+               ~s{ select: [:age, :id, :name]>}
+  end
 
-                         # tail
-                         {
-                           :and,
-                           [],
-                           [
-                             {
-                               :==,
-                               [],
-                               [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [1]}]
-                             },
-                             {
-                               :==,
-                               [],
-                               [{{:., [], [{:&, [], [0]}, :name]}, [], []}, {:^, [], [2]}]
-                             }
-                           ]
-                         }
-                       ]
-                     },
-                     # range wheres
-                     {
-                       :and,
-                       [],
-                       [
-                         {:>, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [3]}]},
-                         {:<, [], [{{:., [], [{:&, [], [0]}, :age]}, [], []}, {:^, [], [4]}]}
-                       ]
-                     }
-                   ]
-                 },
-                 params: [
-                   {20, {0, :age}},
-                   {60, {0, :age}},
-                   {"Alice", {0, :name}},
-                   {20, {0, :age}},
-                   {60, {0, :age}}
-                 ]
-               }
-             ]
-           } = Query.paginate(User, config)
+  defp expr(query) do
+    query |> inspect() |> Inspect.Algebra.format(80) |> to_string()
   end
 end

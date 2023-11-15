@@ -93,9 +93,13 @@ defmodule JetExt.Ecto.Enum do
   @doc "Returns the possible dump values for a given schema and field"
   @spec dump_values(module(), atom()) :: [String.t()] | [integer()]
   def dump_values(schema, field) do
-    schema
-    |> fetch_parameter!(field, :on_dump)
-    |> Map.values()
+    # the order of map keys is not guaranteed when iterating over a map
+    on_dump = fetch_parameter!(schema, field, :on_dump)
+    mappings = fetch_parameter!(schema, field, :mappings)
+
+    Enum.map(mappings, fn {key, _value} ->
+      Map.fetch!(on_dump, key)
+    end)
   end
 
   @doc "Returns the mappings for a given schema and field"

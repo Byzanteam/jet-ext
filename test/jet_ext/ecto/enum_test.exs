@@ -58,7 +58,7 @@ defmodule JetExt.Ecto.EnumTest do
     end
 
     test "dump_values/2" do
-      assert ["BAR", "FOO"] = JetExt.Ecto.Enum.dump_values(ParameterizedSchema, :type)
+      assert ["FOO", "BAR"] = JetExt.Ecto.Enum.dump_values(ParameterizedSchema, :type)
     end
 
     test "mappings/2" do
