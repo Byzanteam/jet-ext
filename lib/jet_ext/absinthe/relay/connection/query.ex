@@ -7,17 +7,26 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
 
   @spec paginate(Ecto.Queryable.t(), Config.t()) :: Ecto.Queryable.t()
   def paginate(queryable, %Config{} = config) do
+    get_type = fn field ->
+      JetExt.Absinthe.Relay.Connection.FieldType.get_type(queryable, field)
+    end
+
     queryable
-    |> select_merge([q], ^Keyword.keys(config.cursor_fields))
+    |> select_merge([q], ^typed_select(config.cursor_fields, get_type))
     |> order_query(config)
-    |> maybe_where(config)
+    |> maybe_where(config, get_type)
     |> limit(^query_limit(config))
   end
 
-  defp maybe_where(query, %Config{
-         after: nil,
-         before: nil
-       }) do
+  defp typed_select(cursor_fields, get_type) do
+    Map.new(cursor_fields, fn {field, _value} ->
+      type = get_type.(field)
+
+      {field, dynamic([q], type(field(q, ^field), ^type))}
+    end)
+  end
+
+  defp maybe_where(query, %Config{after: nil, before: nil}, _get_type) do
     query
   end
 
@@ -27,8 +36,11 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
            after: after_values,
            before: nil,
            cursor_fields: cursor_fields
-         } = config
+         } = config,
+         get_type
        ) do
+    after_values = typed_cursor(after_values, get_type)
+
     {condition, side_edge_condition} = filter_values(cursor_fields, after_values, :after, config)
     wheres = or_join_dynamics([side_edge_condition, condition])
 
@@ -41,8 +53,11 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
            after: nil,
            before: before_values,
            cursor_fields: cursor_fields
-         } = config
+         } = config,
+         get_type
        ) do
+    before_values = typed_cursor(before_values, get_type)
+
     {condition, side_edge_condition} =
       filter_values(cursor_fields, before_values, :before, config)
 
@@ -57,8 +72,12 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
            after: after_values,
            before: before_values,
            cursor_fields: cursor_fields
-         } = config
+         } = config,
+         get_type
        ) do
+    before_values = typed_cursor(before_values, get_type)
+    after_values = typed_cursor(after_values, get_type)
+
     {after_condition, head_edge_condition} =
       filter_values(cursor_fields, after_values, :after, config)
 
@@ -70,6 +89,18 @@ defmodule JetExt.Absinthe.Relay.Connection.Query do
     wheres = or_join_dynamics([head_edge_condition, tail_edge_condition, conditions])
 
     from(query, where: ^wheres)
+  end
+
+  defp typed_cursor(cursor, get_type) do
+    Map.new(cursor, fn {field, value} ->
+      # ensure that use is_nil(term) in wheres for nil values
+      if is_nil(value) do
+        {field, nil}
+      else
+        type = get_type.(field)
+        {field, dynamic([q], type(^value, ^type))}
+      end
+    end)
   end
 
   defp get_operator("asc" <> _tail, :before), do: :lt
