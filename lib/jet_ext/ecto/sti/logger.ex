@@ -29,6 +29,6 @@ defmodule JetExt.Ecto.STI.Logger do
   defp log(message) do
     require Logger
 
-    Logger.warn(fn -> message end)
+    Logger.warning(fn -> message end)
   end
 end
