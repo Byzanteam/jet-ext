@@ -23,10 +23,11 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
 
     assert expr(Query.paginate(User, config)) ===
              ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User,} <>
-               ~s{ where: u0.age > ^20} <>
-               ~s{ or (u0.name > ^"Alice" and u0.age == ^20),} <>
+               ~s{ where: u0.age > type(^20, :integer) or\n } <>
+               ~s{ (u0.name > type(^"Alice", :string) and u0.age == type(^20, :integer)),} <>
                ~s{ order_by: [asc: u0.age, asc: u0.name],} <>
-               ~s{ limit: ^51,} <> ~s{ select: [:age, :name, :id]>}
+               ~s{ limit: ^51,} <>
+               ~s| select: merge(u0, %{name: type(u0.name, :string), age: type(u0.age, :integer)})>|
   end
 
   test "works with include_head_edge and include_tail_edge" do
@@ -42,11 +43,12 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
 
     assert expr(Query.paginate(User, config)) ===
              ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User,} <>
-               ~s{ where: u0.age == ^20} <>
-               ~s{ or u0.age == ^60} <>
-               ~s{ or (u0.age > ^20 and u0.age < ^60),} <>
+               ~s{ where: u0.age == type(^20, :integer)} <>
+               ~s{ or u0.age == type(^60, :integer) or\n } <>
+               ~s{ (u0.age > type(^20, :integer) and u0.age < type(^60, :integer)),} <>
                ~s{ order_by: [asc: u0.age],} <>
-               ~s{ limit: ^51,} <> ~s{ select: [:age, :id, :name]>}
+               ~s{ limit: ^51,} <>
+               ~s| select: merge(u0, %{age: type(u0.age, :integer)})>|
   end
 
   test "works with include_head_edge and include_tail_edge, nil values" do
@@ -62,12 +64,12 @@ defmodule JetExt.Absinthe.Relay.Connection.QueryTest do
 
     assert expr(Query.paginate(User, config)) ===
              ~s{#Ecto.Query<from u0 in JetExt.Absinthe.Relay.Connection.QueryTest.User, } <>
-               ~s{where: (is_nil(u0.name) and u0.age == ^20)} <>
-               ~s{ or (u0.name == ^"Alice" and u0.age == ^60)} <>
-               ~s{ or\n  (u0.age > ^20 and u0.age < ^60),} <>
+               ~s{where: (is_nil(u0.name) and u0.age == type(^20, :integer)) or\n } <>
+               ~s{ (u0.name == type(^"Alice", :string) and u0.age == type(^60, :integer))} <>
+               ~s{ or\n  (u0.age > type(^20, :integer) and u0.age < type(^60, :integer)),} <>
                ~s{ order_by: [asc: u0.age],} <>
                ~s{ limit: ^51,} <>
-               ~s{ select: [:age, :id, :name]>}
+               ~s| select: merge(u0, %{age: type(u0.age, :integer)})>|
   end
 
   defp expr(query) do
