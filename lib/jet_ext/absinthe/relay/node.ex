@@ -50,9 +50,9 @@ defmodule JetExt.Absinthe.Relay.Node do
 
     node field do
       resolve fn
-        %{type: :person, node_id: id}, _ ->
+        %{type: :person, id: id}, _ ->
           {:ok, Map.get(@people, id)}
-        %{type: :business, node_id: id}, _ ->
+        %{type: :business, id: id}, _ ->
           {:ok, Map.get(@businesses, id)}
       end
     end
@@ -208,7 +208,7 @@ defmodule JetExt.Absinthe.Relay.Node do
   """
   @spec from_global_id(nil, Absinthe.Schema.t()) :: {:ok, nil}
   @spec from_global_id(global_id, Absinthe.Schema.t()) ::
-          {:ok, %{type: atom, node_id: binary}} | {:error, binary}
+          {:ok, %{type: atom, id: binary}} | {:error, binary}
   def from_global_id(nil, _schema) do
     {:ok, nil}
   end
@@ -230,7 +230,7 @@ defmodule JetExt.Absinthe.Relay.Node do
 
       %{identifier: ident, interfaces: interfaces} ->
         if Enum.member?(List.wrap(interfaces), :node) do
-          {:ok, %{type: ident, node_id: id}}
+          {:ok, %{type: ident, id: id}}
         else
           {:error, "Type `#{type_name}' is not a valid node type"}
         end

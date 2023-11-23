@@ -52,7 +52,7 @@ defmodule JetExt.Absinthe.Relay.NodeTest do
     query do
       node field do
         resolve fn
-          %{node_id: id, type: :foo}, _info ->
+          %{id: id, type: :foo}, _info ->
             {:ok, Map.get(@foos, id)}
         end
       end
