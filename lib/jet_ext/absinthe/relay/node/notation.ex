@@ -115,7 +115,7 @@ defmodule JetExt.Absinthe.Relay.Node.Notation do
       @desc "The ID of an object."
       arg(:node_id, non_null(unquote(id_type)))
 
-      middleware({JetExt.Absinthe.Relay.Node, :resolve_with_global_id})
+      middleware({JetExt.Absinthe.Relay.Node.Notation, :resolve_with_global_id})
     end
   end
 
@@ -127,10 +127,29 @@ defmodule JetExt.Absinthe.Relay.Node.Notation do
     quote do
       @desc "The ID of an object"
       field :node_id, non_null(unquote(id_type)) do
-        middleware {JetExt.Absinthe.Relay.Node, :global_id_resolver}, unquote(id_fetcher)
+        middleware {Absinthe.Relay.Node, :global_id_resolver}, unquote(id_fetcher)
       end
 
       interface(:node)
     end
+  end
+
+  @spec resolve_with_global_id(Absinthe.Resolution.t(), term()) ::
+          Absinthe.Resolution.t()
+  def resolve_with_global_id(
+        %{state: :unresolved, arguments: %{node_id: global_id}} = res,
+        _opts
+      ) do
+    case Absinthe.Relay.Node.from_global_id(global_id, res.schema) do
+      {:ok, result} ->
+        %{res | arguments: result}
+
+      error ->
+        Absinthe.Resolution.put_result(res, error)
+    end
+  end
+
+  def resolve_with_global_id(res, _opts) do
+    res
   end
 end

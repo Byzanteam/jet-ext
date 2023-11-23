@@ -11,7 +11,7 @@ defmodule JetExt.MixProject do
       deps: deps(),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore.exs",
-        plt_add_apps: [:urn, :plug, :absinthe]
+        plt_add_apps: [:urn, :plug, :absinthe, :absinthe_relay]
       ]
     ]
   end
