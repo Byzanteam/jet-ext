@@ -31,7 +31,8 @@ defmodule JetExt.MixProject do
       {:absinthe_relay, "~> 1.5", optional: true},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:mimic, "~> 1.7", only: :test}
     ]
   end
 
