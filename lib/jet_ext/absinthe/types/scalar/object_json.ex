@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Absinthe) && Code.ensure_loaded?(Jason) do
+if Code.ensure_loaded?(Absinthe) do
   defmodule JetExt.Absinthe.Types.Scalar.ObjectJSON do
     @moduledoc false
 
