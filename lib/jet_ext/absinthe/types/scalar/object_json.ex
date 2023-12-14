@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Absinthe) do
+if Code.ensure_loaded?(Absinthe) && Code.ensure_loaded?(Jason) do
   defmodule JetExt.Absinthe.Types.Scalar.ObjectJSON do
     @moduledoc false
 
@@ -6,8 +6,11 @@ if Code.ensure_loaded?(Absinthe) do
 
     scalar :object_json, name: "ObjectJSON" do
       description """
-      The `ObjectJSON` scalar type represents arbitrary JSON string data, represented as UTF-8
-      character sequences.
+      The `ObjectJSON` scalar type represents arbitrary JSON object data, represented as UTF-8 character sequences.
+
+      This type is specifically tailored to work with JSON objects at the root level, ensuring that the top-level element of the JSON structure is always a JSON object.
+      It does not support other JSON types (like arrays or primitives) as the root element.
+      This makes it ideal for scenarios where JSON data is structured as key-value pairs at the highest level."
       """
 
       serialize(&encode/1)
@@ -27,21 +30,27 @@ if Code.ensure_loaded?(Absinthe) do
 
     defp decode(_input), do: :error
 
-    defp encode(value) do
+    defp encode(value) when is_map(value) do
       value
       |> iterate()
       |> Jason.encode!()
     end
 
+    defp encode(_value) do
+      raise Absinthe.SerializationError
+    end
+
     # iterate
 
-    require Decimal
+    if Code.ensure_loaded?(Decimal) do
+      require Decimal
 
-    defp iterate(value) when Decimal.is_decimal(value) do
-      if Decimal.integer?(value) do
-        Decimal.to_integer(value)
-      else
-        Decimal.to_float(value)
+      defp iterate(value) when Decimal.is_decimal(value) do
+        if Decimal.integer?(value) do
+          Decimal.to_integer(value)
+        else
+          Decimal.to_float(value)
+        end
       end
     end
 
