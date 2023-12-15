@@ -30,7 +30,7 @@ if Code.ensure_loaded?(Absinthe) do
 
     defp decode(_input), do: :error
 
-    defp encode(value) when is_map(value) do
+    defp encode(value) when is_map(value) and not is_struct(value) do
       value
       |> iterate()
       |> Jason.encode!()
