@@ -2,6 +2,7 @@ defmodule JetExt.Absinthe.Relay.Connection.Cursor do
   @moduledoc false
 
   alias JetExt.Absinthe.Relay.Connection.Config
+  alias JetExt.Absinthe.Relay.Connection.Cursor.Extractor
 
   @spec decode(binary()) :: {:ok, term()} | {:error, term()}
   def decode(nil), do: {:ok, nil}
@@ -22,7 +23,7 @@ defmodule JetExt.Absinthe.Relay.Connection.Cursor do
   @spec encode_record(map(), Config.t()) :: binary()
   def encode_record(%{} = map, %Config{} = config) do
     map
-    |> Map.take(Keyword.keys(config.cursor_fields))
+    |> Extractor.extract(Keyword.keys(config.cursor_fields))
     |> :erlang.term_to_binary()
     |> Base.url_encode64(padding: false)
   end
