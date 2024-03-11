@@ -7,6 +7,8 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
 
     @behaviour JetExt.Absinthe.ErrorHandler
 
+    require Logger
+
     @impl JetExt.Absinthe.ErrorHandler
     def handle(atom) when is_atom(atom), do: {:ok, Atom.to_string(atom)}
 
@@ -27,6 +29,9 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
       |> then(&{:ok, &1})
     end
 
-    def handle(_error), do: :error
+    def handle(error) do
+      Logger.warning("Error can not be handled by #{__MODULE__}", error: error)
+      :error
+    end
   end
 end
