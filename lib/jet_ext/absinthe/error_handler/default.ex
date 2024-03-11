@@ -10,7 +10,9 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
     @impl JetExt.Absinthe.ErrorHandler
     def handle(atom) when is_atom(atom), do: {:ok, Atom.to_string(atom)}
 
-    def handle(exception) when is_exception(exception), do: {:ok, Exception.message(exception)}
+    def handle(exception) when is_exception(exception) do
+      {:ok, %{message: Exception.message(exception)}}
+    end
 
     def handle(%Ecto.Changeset{} = changeset) do
       changeset
