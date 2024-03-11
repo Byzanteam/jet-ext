@@ -30,7 +30,7 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
     end
 
     def handle(error) do
-      Logger.warning("Error can not be handled by #{__MODULE__}", error: error)
+      Logger.warning("Error #{inspect(error)} can not be handled by #{__MODULE__}")
       :error
     end
   end
