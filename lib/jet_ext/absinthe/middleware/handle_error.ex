@@ -3,6 +3,9 @@ if Code.ensure_loaded?(Absinthe) do
     @moduledoc """
     Absinthe Middleware to support more types of error.
 
+    The operating logic of error handlers is in the form of fallback,
+    and each error is handled by at most one handler.
+
     It can be configured with:
 
       config :jext_ext, Absinthe,
@@ -26,12 +29,14 @@ if Code.ensure_loaded?(Absinthe) do
     end
 
     defp transform(error) do
-      Enum.reduce_while(@handlers, error, fn handler, default ->
+      @handlers
+      |> Enum.reduce_while(error, fn handler, default ->
         case handler.handle(default) do
           {:ok, error} -> {:halt, error}
           :error -> {:cont, default}
         end
       end)
+      |> List.wrap()
     end
   end
 end
