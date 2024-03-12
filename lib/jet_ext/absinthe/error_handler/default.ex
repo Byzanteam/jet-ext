@@ -29,9 +29,6 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
       |> then(&{:ok, &1})
     end
 
-    def handle(error) do
-      Logger.warning("Error #{inspect(error)} can not be handled by #{__MODULE__}")
-      :error
-    end
+    def handle(_error), do: :error
   end
 end
