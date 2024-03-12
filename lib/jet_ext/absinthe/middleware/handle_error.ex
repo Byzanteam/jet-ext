@@ -26,12 +26,14 @@ if Code.ensure_loaded?(Absinthe) do
     end
 
     defp transform(error) do
-      Enum.reduce_while(@handlers, error, fn handler, default ->
-        case handler.handle(default) do
-          {:ok, error} -> {:halt, List.wrap(error)}
-          :error -> {:cont, List.wrap(default)}
+      @handlers
+      |> Enum.reduce(error, fn handler, acc ->
+        case handler.handle(acc) do
+          {:ok, error} -> error
+          :error -> acc
         end
       end)
+      |> List.wrap()
     end
   end
 end
