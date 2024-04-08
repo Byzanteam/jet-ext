@@ -21,11 +21,10 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Absinthe.Relay) do
         end
 
         defmacro node_object(identifier, attrs, do: block) do
-          pk_name = unquote(pk_name)
-          pk_source_name = unquote(pk_source_name)
-          pk_type = unquote(pk_type)
-
           {node_type, attrs} = Keyword.pop!(attrs, :node_type)
+          {pk_name, attrs} = Keyword.pop(attrs, :name, unquote(pk_name))
+          {pk_source_name, attrs} = Keyword.pop(attrs, :source_name, unquote(pk_source_name))
+          {pk_type, attrs} = Keyword.pop(attrs, :type, unquote(pk_type))
 
           block = [
             quote do
