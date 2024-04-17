@@ -93,6 +93,8 @@ if Code.ensure_loaded?(Absinthe) do
       end
     end
 
+    def call(%Absinthe.Resolution{} = res, _opts), do: res
+
     # relay 风格的参数需要特殊处理一下，因为 relay 会提前对它进行特殊处理，
     # 把 %{input: arguments} 变成 arguments
     defp extract_argument_defs(%Absinthe.Resolution{
