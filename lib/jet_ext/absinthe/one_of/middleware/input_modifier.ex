@@ -125,7 +125,8 @@ if Code.ensure_loaded?(Absinthe) do
     defp modify_input(
            data,
            %Input.Object{schema_node: schema_node, fields: fields} = input_object
-         ) do
+         )
+         when is_map(data) do
       schema_node = Absinthe.Type.unwrap(schema_node)
 
       case Keyword.fetch(schema_node.__private__, :input_modifier) do
@@ -136,7 +137,16 @@ if Code.ensure_loaded?(Absinthe) do
           modify_input(data, input_object)
 
         _otherwise ->
-          Map.new(data, &modify_input_object_entry(&1, fields))
+          case data do
+            struct when is_struct(struct) ->
+              struct(
+                struct,
+                Enum.map(Map.from_struct(struct), &modify_input_object_entry(&1, fields))
+              )
+
+            data when is_map(data) ->
+              Map.new(data, &modify_input_object_entry(&1, fields))
+          end
       end
     end
 
