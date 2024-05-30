@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "26.0.2"
+          elixir-version: "1.14.5-otp-26"
+
+      - run: mix deps.get
+      - run: mix hex.build
+      - run: mix hex.publish --yes --replace
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
