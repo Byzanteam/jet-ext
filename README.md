@@ -1,6 +1,6 @@
 # JetExt
 
-**TODO: Add description**
+**The extended tools for the Jet Team.**
 
 ## Installation
 

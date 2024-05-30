@@ -6,6 +6,16 @@ defmodule JetExt.MixProject do
       app: :jet_ext,
       version: "0.1.0",
       elixir: "~> 1.14",
+      description: "The extended tools for the Jet Team.",
+      source_url: "https://github.com/Byzanteam/jet-ext",
+      package: [
+        name: "jet_ext",
+        licenses: ["MIT"],
+        files: ~w(lib mix.exs mix.lock .tool-versions README.md),
+        links: %{
+          "GitHub" => "https://github.com/Byzanteam/jet-ext"
+        }
+      ],
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
