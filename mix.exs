@@ -42,7 +42,8 @@ defmodule JetExt.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:jason, "~> 1.4"},
-      {:mimic, "~> 1.7", only: :test}
+      {:mimic, "~> 1.7", only: :test},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end
 
