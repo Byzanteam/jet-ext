@@ -12,7 +12,7 @@ defmodule JetExt.Absinthe.OneOf.PhaseTest do
         field_a: "a",
         field_b: "b"
       }}) {
-        bar
+        foo
       }
     }
     """
