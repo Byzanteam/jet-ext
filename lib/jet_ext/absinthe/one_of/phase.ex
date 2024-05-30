@@ -1,6 +1,8 @@
 if Code.ensure_loaded?(Absinthe) do
   defmodule JetExt.Absinthe.OneOf.Phase do
     @moduledoc """
+    The homemade `one_of` phase for Absinthe.
+
     ## 使用方法
     在 Router 中添加如下代码：
     ```elixir

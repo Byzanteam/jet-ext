@@ -1,5 +1,7 @@
 defmodule JetExt.Absinthe.OneOf do
   @moduledoc """
+  The homemade `one_of` directive for Absinthe.
+
   ## 使用方法
   1. 参考 `JetExt.Absinthe.OneOf.Phase` 的文档，将 phase 加入到 absinthe 的 phases 中
   2. 参考 `JetExt.Absinthe.OneOf.SchemaProtoType` 的文档，在你的 absinthe schema 引入 `:one_of` directive

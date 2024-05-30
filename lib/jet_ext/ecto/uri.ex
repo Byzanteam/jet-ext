@@ -5,74 +5,74 @@ defmodule JetExt.Ecto.URI do
 
   ## Examples
 
-    # cast
-    iex> cast("https://elixir-lang.org/")
-    {:ok, %URI{
-      fragment: nil,
-      host: "elixir-lang.org",
-      path: "/",
-      port: 443,
-      query: nil,
-      scheme: "https",
-      userinfo: nil
-    }}
+      # cast
+      iex> cast("https://elixir-lang.org/")
+      {:ok, %URI{
+        fragment: nil,
+        host: "elixir-lang.org",
+        path: "/",
+        port: 443,
+        query: nil,
+        scheme: "https",
+        userinfo: nil
+      }}
 
-    iex> cast("/foo")
-    {:ok, %URI{
-      fragment: nil,
-      host: nil,
-      path: "/foo",
-      port: nil,
-      query: nil,
-      scheme: nil,
-      userinfo: nil
-    }}
+      iex> cast("/foo")
+      {:ok, %URI{
+        fragment: nil,
+        host: nil,
+        path: "/foo",
+        port: nil,
+        query: nil,
+        scheme: nil,
+        userinfo: nil
+      }}
 
-    iex> cast(:foo)
-    :error
+      iex> cast(:foo)
+      :error
 
-    iex> cast("/invalid_greater_than_in_path/>")
-    {:error, part: ">"}
+      iex> cast("/invalid_greater_than_in_path/>")
+      {:error, part: ">"}
 
-    # load
-    iex> load("https://elixir-lang.org/")
-    {:ok, %URI{
-      fragment: nil,
-      host: "elixir-lang.org",
-      path: "/",
-      port: 443,
-      query: nil,
-      scheme: "https",
-      userinfo: nil
-    }}
+      # load
+      iex> load("https://elixir-lang.org/")
+      {:ok, %URI{
+        fragment: nil,
+        host: "elixir-lang.org",
+        path: "/",
+        port: 443,
+        query: nil,
+        scheme: "https",
+        userinfo: nil
+      }}
 
-    iex> load(URI.new!("https://elixir-lang.org/"))
-    {:ok, %URI{
-      fragment: nil,
-      host: "elixir-lang.org",
-      path: "/",
-      port: 443,
-      query: nil,
-      scheme: "https",
-      userinfo: nil
-    }}
+      iex> load(URI.new!("https://elixir-lang.org/"))
+      {:ok, %URI{
+        fragment: nil,
+        host: "elixir-lang.org",
+        path: "/",
+        port: 443,
+        query: nil,
+        scheme: "https",
+        userinfo: nil
+      }}
 
-    iex> load(%{})
-    :error
+      iex> load(%{})
+      :error
 
-    iex> load(:path)
-    :error
+      iex> load(:path)
+      :error
 
-    # dump
+      # dump
 
-    iex> dump(URI.new!("https://elixir-lang.org/"))
-    {:ok, "https://elixir-lang.org/"}
+      iex> dump(URI.new!("https://elixir-lang.org/"))
+      {:ok, "https://elixir-lang.org/"}
 
-    iex> dump(%{})
-    :error
+      iex> dump(%{})
+      :error
 
-    iex> dump(:path)
-    :error
+      iex> dump(:path)
+      :error
   """
 
   use Ecto.Type

@@ -4,62 +4,62 @@ defmodule JetExt.Ecto.Version do
 
   ## Examples
 
-    # cast
-    iex> cast("2.0.1-alpha1")
-    {:ok, %Version{
-      major: 2,
-      minor: 0,
-      patch: 1,
-      pre: ["alpha1"]
-    }}
+      # cast
+      iex> cast("2.0.1-alpha1")
+      {:ok, %Version{
+        major: 2,
+        minor: 0,
+        patch: 1,
+        pre: ["alpha1"]
+      }}
 
-    iex> cast(Version.parse!("2.0.1-alpha1"))
-    {:ok, %Version{
-      major: 2,
-      minor: 0,
-      patch: 1,
-      pre: ["alpha1"]
-    }}
+      iex> cast(Version.parse!("2.0.1-alpha1"))
+      {:ok, %Version{
+        major: 2,
+        minor: 0,
+        patch: 1,
+        pre: ["alpha1"]
+      }}
 
-    iex> cast("1")
-    :error
+      iex> cast("1")
+      :error
 
-    iex> cast(:foo)
-    :error
+      iex> cast(:foo)
+      :error
 
-    # load
-    iex> load("2.0.1-alpha1")
-    {:ok, %Version{
-      major: 2,
-      minor: 0,
-      patch: 1,
-      pre: ["alpha1"]
-    }}
+      # load
+      iex> load("2.0.1-alpha1")
+      {:ok, %Version{
+        major: 2,
+        minor: 0,
+        patch: 1,
+        pre: ["alpha1"]
+      }}
 
-    iex> load(Version.parse!("2.0.1-alpha1"))
-    {:ok, %Version{
-      major: 2,
-      minor: 0,
-      patch: 1,
-      pre: ["alpha1"]
-    }}
+      iex> load(Version.parse!("2.0.1-alpha1"))
+      {:ok, %Version{
+        major: 2,
+        minor: 0,
+        patch: 1,
+        pre: ["alpha1"]
+      }}
 
-    iex> load("1")
-    :error
+      iex> load("1")
+      :error
 
-    iex> load(:foo)
-    :error
+      iex> load(:foo)
+      :error
 
-    # dump
+      # dump
 
-    iex> dump(Version.parse!("2.0.1-alpha1"))
-    {:ok, "2.0.1-alpha1"}
+      iex> dump(Version.parse!("2.0.1-alpha1"))
+      {:ok, "2.0.1-alpha1"}
 
-    iex> dump(%{})
-    :error
+      iex> dump(%{})
+      :error
 
-    iex> dump(:foo)
-    :error
+      iex> dump(:foo)
+      :error
   """
 
   use Ecto.Type

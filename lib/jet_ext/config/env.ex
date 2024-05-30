@@ -23,7 +23,7 @@ defmodule JetExt.Config.Env do
   Options:
   - default: the default value to return if the environment variable is missing
   - hint: a hint to be used in the error message,
-  it can contain %{name} which will be replaced by the environment variable name
+  it can contain `%{name}` which will be replaced by the environment variable name
   """
   @spec fetch_string!(name :: String.t(), options()) :: String.t()
   def fetch_string!(name, options \\ []) when is_binary(name) and is_list(options) do
@@ -42,7 +42,7 @@ defmodule JetExt.Config.Env do
   Options:
   - default: the default value to return if the environment variable is missing
   - hint: a hint to be used in the error message,
-  it can contain %{name} which will be replaced by the environment variable name
+  it can contain `%{name}` which will be replaced by the environment variable name
   """
   @spec fetch_integer!(name :: String.t(), options()) :: integer()
   def fetch_integer!(name, options \\ []) when is_binary(name) and is_list(options) do
@@ -92,7 +92,7 @@ defmodule JetExt.Config.Env do
   Casts an environment variable to a boolean.
 
   Any string except `"false"` and `"0"` will be cast to `true`.
-  Here are some truty values: `"true"`, `"1"`, `"yes"`, `"on"`.
+  Here are some truthy values: `"true"`, `"1"`, `"yes"`, `"on"`.
   """
   @spec cast_boolean(name :: String.t()) :: boolean()
   def cast_boolean(name) do

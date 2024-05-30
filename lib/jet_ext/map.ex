@@ -1,8 +1,6 @@
 defmodule JetExt.Map do
   @moduledoc """
   This module introduces some useful functions to `Map`.
-
-  - `atomize_keys/1`
   """
 
   @compile {:inline, atomize_keys: 1, recursive_atomize_keys: 1, filter: 2, fetch: 2}
@@ -12,12 +10,12 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => 2})
-    %{a: 1, b: 2}
-    iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => %{"c" => 2}})
-    %{a: 1, b: %{"c" => 2}}
-    iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => [%{"c" => 2}, %{"d" => 3}]})
-    %{a: 1, b: [%{"c" => 2}, %{"d" => 3}]}
+      iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => 2})
+      %{a: 1, b: 2}
+      iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => %{"c" => 2}})
+      %{a: 1, b: %{"c" => 2}}
+      iex> JetExt.Map.atomize_keys(%{"a" => 1, "b" => [%{"c" => 2}, %{"d" => 3}]})
+      %{a: 1, b: [%{"c" => 2}, %{"d" => 3}]}
   """
   @spec atomize_keys(map()) :: map()
   def atomize_keys(data) when is_struct(data), do: data
@@ -37,10 +35,10 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.stringify_keys(%{a: 1, b: 2})
-    %{"a" => 1, "b" => 2}
-    iex> JetExt.Map.stringify_keys(%{a: 1, b: %{c: 2}})
-    %{"a" => 1, "b" => %{c: 2}}
+      iex> JetExt.Map.stringify_keys(%{a: 1, b: 2})
+      %{"a" => 1, "b" => 2}
+      iex> JetExt.Map.stringify_keys(%{a: 1, b: %{c: 2}})
+      %{"a" => 1, "b" => %{c: 2}}
   """
   @spec stringify_keys(map()) :: map()
   def stringify_keys(data) when is_struct(data), do: data
@@ -57,16 +55,16 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.recursive_atomize_keys(%{"a" => 1, "b" => 2})
-    %{a: 1, b: 2}
-    iex> JetExt.Map.recursive_atomize_keys(%{"a" => 1, "b" => %{"c" => 2}})
-    %{a: 1, b: %{c: 2}}
-    iex> JetExt.Map.recursive_atomize_keys(%{"a" => [%{"b" => %{"c" => 2}}]})
-    %{a: [%{b: %{c: 2}}]}
-    iex> JetExt.Map.recursive_atomize_keys(%{"a" => [%{"b" => %{"c" => 2}}], d: true})
-    %{a: [%{b: %{c: 2}}], d: true}
-    iex> JetExt.Map.recursive_atomize_keys([%{"a" => 1}, "b"])
-    [%{a: 1}, "b"]
+      iex> JetExt.Map.recursive_atomize_keys(%{"a" => 1, "b" => 2})
+      %{a: 1, b: 2}
+      iex> JetExt.Map.recursive_atomize_keys(%{"a" => 1, "b" => %{"c" => 2}})
+      %{a: 1, b: %{c: 2}}
+      iex> JetExt.Map.recursive_atomize_keys(%{"a" => [%{"b" => %{"c" => 2}}]})
+      %{a: [%{b: %{c: 2}}]}
+      iex> JetExt.Map.recursive_atomize_keys(%{"a" => [%{"b" => %{"c" => 2}}], d: true})
+      %{a: [%{b: %{c: 2}}], d: true}
+      iex> JetExt.Map.recursive_atomize_keys([%{"a" => 1}, "b"])
+      [%{a: 1}, "b"]
   """
   @spec recursive_atomize_keys(term()) :: term()
   def recursive_atomize_keys(data) when is_list(data) do
@@ -94,8 +92,8 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.filter(%{a: 1, b: 2, c: 3, d: 4}, fn {key, value} -> :a === key or 2 === value end)
-    %{a: 1, b: 2}
+      iex> JetExt.Map.filter(%{a: 1, b: 2, c: 3, d: 4}, fn {key, value} -> :a === key or 2 === value end)
+      %{a: 1, b: 2}
   """
   @spec filter(map(), function()) :: map()
   def filter(%{} = data, filter_funciton) when is_function(filter_funciton, 1) do
@@ -107,14 +105,14 @@ defmodule JetExt.Map do
   @doc """
   Put a value to map base on key type of the map.
 
-    iex> JetExt.Map.put_field(%{a: 1, b: 2}, :c, 3)
-    %{a: 1, b: 2, c: 3}
+      iex> JetExt.Map.put_field(%{a: 1, b: 2}, :c, 3)
+      %{a: 1, b: 2, c: 3}
 
-    iex> JetExt.Map.put_field(%{"a" => 1, "b" => 2}, :c, 3)
-    %{"a" => 1, "b" => 2, "c" => 3}
+      iex> JetExt.Map.put_field(%{"a" => 1, "b" => 2}, :c, 3)
+      %{"a" => 1, "b" => 2, "c" => 3}
 
-    iex> JetExt.Map.put_field(%{"a" => 1, b: 2}, :c, 3)
-    ** (ArgumentError) expected map to be a map with atoms or string keys, got a map with mixed keys: %{:b => 2, "a" => 1}
+      iex> JetExt.Map.put_field(%{"a" => 1, b: 2}, :c, 3)
+      ** (ArgumentError) expected map to be a map with atoms or string keys, got a map with mixed keys: %{:b => 2, "a" => 1}
   """
   @spec put_field(map(), atom(), term()) :: map()
   def put_field(map, key, value) when is_atom(key) do
@@ -137,14 +135,14 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_fetch!(%{a: 1}, :a)
-    1
+      iex> JetExt.Map.indifferent_fetch!(%{a: 1}, :a)
+      1
 
-    iex> JetExt.Map.indifferent_fetch!(%{"a" => 1}, :a)
-    1
+      iex> JetExt.Map.indifferent_fetch!(%{"a" => 1}, :a)
+      1
 
-    iex> JetExt.Map.indifferent_fetch!(%{"a" => 1}, :b)
-    ** (KeyError) key :b not found in: %{"a" => 1}
+      iex> JetExt.Map.indifferent_fetch!(%{"a" => 1}, :b)
+      ** (KeyError) key :b not found in: %{"a" => 1}
   """
   @spec indifferent_fetch!(map(), key :: atom()) :: term()
   def indifferent_fetch!(map, key) when is_atom(key) do
@@ -159,14 +157,14 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_fetch(%{a: 1}, :a)
-    {:ok, 1}
+      iex> JetExt.Map.indifferent_fetch(%{a: 1}, :a)
+      {:ok, 1}
 
-    iex> JetExt.Map.indifferent_fetch(%{"a" => 1}, :a)
-    {:ok, 1}
+      iex> JetExt.Map.indifferent_fetch(%{"a" => 1}, :a)
+      {:ok, 1}
 
-    iex> JetExt.Map.indifferent_fetch(%{"a" => 1}, :b)
-    :error
+      iex> JetExt.Map.indifferent_fetch(%{"a" => 1}, :b)
+      :error
   """
   @spec indifferent_fetch(map(), key :: atom()) :: term()
   def indifferent_fetch(map, key) when is_atom(key) do
@@ -183,14 +181,14 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_take(%{"a" => 1, "b" => 2, c: 3, d: 4}, [:a, :b, :c])
-    %{a: 1, b: 2, c: 3}
+      iex> JetExt.Map.indifferent_take(%{"a" => 1, "b" => 2, c: 3, d: 4}, [:a, :b, :c])
+      %{a: 1, b: 2, c: 3}
 
-    iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:a])
-    %{a: 1}
+      iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:a])
+      %{a: 1}
 
-    iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:b])
-    %{}
+      iex> JetExt.Map.indifferent_take(%{"a" => 1}, [:b])
+      %{}
   """
   @spec indifferent_take(map(), keys :: [atom()]) :: map()
   def indifferent_take(map, keys) when is_list(keys) do
@@ -209,14 +207,14 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_has_key(%{a: 1}, :a)
-    {:ok, :a}
+      iex> JetExt.Map.indifferent_has_key(%{a: 1}, :a)
+      {:ok, :a}
 
-    iex> JetExt.Map.indifferent_has_key(%{"a" => 1}, :a)
-    {:ok, "a"}
+      iex> JetExt.Map.indifferent_has_key(%{"a" => 1}, :a)
+      {:ok, "a"}
 
-    iex> JetExt.Map.indifferent_has_key(%{"a" => 1}, :b)
-    :error
+      iex> JetExt.Map.indifferent_has_key(%{"a" => 1}, :b)
+      :error
   """
   @spec indifferent_has_key(map(), key :: atom()) :: {:ok, binary() | atom()} | :error
   def indifferent_has_key(map, key) when is_atom(key) do
@@ -244,14 +242,14 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_update!(%{a: 1}, :a, fn val -> val + 1 end)
-    %{a: 2}
+      iex> JetExt.Map.indifferent_update!(%{a: 1}, :a, fn val -> val + 1 end)
+      %{a: 2}
 
-    iex> JetExt.Map.indifferent_update!(%{"a" => 1}, :a, fn val -> val + 1 end)
-    %{"a" => 2}
+      iex> JetExt.Map.indifferent_update!(%{"a" => 1}, :a, fn val -> val + 1 end)
+      %{"a" => 2}
 
-    iex> JetExt.Map.indifferent_update!(%{"a" => 1}, :b, fn val -> val + 1 end)
-    ** (KeyError) key :b and "b" not found in: %{"a" => 1}
+      iex> JetExt.Map.indifferent_update!(%{"a" => 1}, :b, fn val -> val + 1 end)
+      ** (KeyError) key :b and "b" not found in: %{"a" => 1}
   """
   @spec indifferent_update!(
           map(),
@@ -283,20 +281,20 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.indifferent_get(%{a: 1}, :a)
-    1
+      iex> JetExt.Map.indifferent_get(%{a: 1}, :a)
+      1
 
-    iex> JetExt.Map.indifferent_get(%{"a" => 1}, :a)
-    1
+      iex> JetExt.Map.indifferent_get(%{"a" => 1}, :a)
+      1
 
-    iex> JetExt.Map.indifferent_get(%{"a" => 1}, :b)
-    nil
+      iex> JetExt.Map.indifferent_get(%{"a" => 1}, :b)
+      nil
 
-    iex> JetExt.Map.indifferent_get(%{"a" => 1}, :b, 2)
-    2
+      iex> JetExt.Map.indifferent_get(%{"a" => 1}, :b, 2)
+      2
 
-    iex> JetExt.Map.indifferent_get(%{"a" => 1}, "a")
-    1
+      iex> JetExt.Map.indifferent_get(%{"a" => 1}, "a")
+      1
   """
   @spec indifferent_get(map(), key :: atom(), default :: term()) :: term()
   def indifferent_get(map, key, default \\ nil)
@@ -316,12 +314,12 @@ defmodule JetExt.Map do
 
   ## Example
 
-    iex> JetExt.Map.fetch(%{a: 1, b: nil}, :a)
-    {:a, {:ok, 1}}
-    iex> JetExt.Map.fetch(%{a: 1, b: nil}, :b)
-    {:b, {:ok, nil}}
-    iex> JetExt.Map.fetch(%{a: 1, b: nil}, :c)
-    {:c, :error}
+      iex> JetExt.Map.fetch(%{a: 1, b: nil}, :a)
+      {:a, {:ok, 1}}
+      iex> JetExt.Map.fetch(%{a: 1, b: nil}, :b)
+      {:b, {:ok, nil}}
+      iex> JetExt.Map.fetch(%{a: 1, b: nil}, :c)
+      {:c, :error}
   """
   @spec fetch(map(), key) :: {key, {:ok, term()} | :error} when key: term()
   def fetch(map, key) do

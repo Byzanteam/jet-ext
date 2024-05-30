@@ -1,6 +1,8 @@
 if Code.ensure_loaded?(Absinthe) do
   defmodule JetExt.Absinthe.OneOf.Helpers do
-    @moduledoc false
+    @moduledoc """
+    The helpers for `JetExt.Absinthe.OneOf`.
+    """
 
     alias Absinthe.Blueprint.Input
 

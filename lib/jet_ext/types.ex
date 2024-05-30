@@ -20,9 +20,10 @@ defmodule JetExt.Types do
   @type as_required(t) :: t
 
   @doc """
-  Make (sum type)[https://en.wikipedia.org/wiki/Tagged_union].
-    iex> JetExt.Types.make_sum_type([:foo, :bar, :baz])
-    quote do :foo | :bar | :baz end
+  Make [sum type](https://en.wikipedia.org/wiki/Tagged_union).
+
+      iex> JetExt.Types.make_sum_type([:foo, :bar, :baz])
+      quote do :foo | :bar | :baz end
   """
   @spec make_sum_type([atom(), ...]) :: Macro.t()
   def make_sum_type(types) do
@@ -46,8 +47,9 @@ defmodule JetExt.Types do
     defmodule Baz do
       @type t() :: :baz
     end
-    ````
-    iex> JetExt.Types.make_module_sum_type([Foo, Bar, Baz], :t)
+    ```
+
+      iex> JetExt.Types.make_module_sum_type([Foo, Bar, Baz], :t)
   """
   @spec make_module_sum_type([module(), ...], atom()) :: Macro.t()
   def make_module_sum_type(modules, type) do

@@ -1,6 +1,8 @@
 if Code.ensure_loaded?(Absinthe) do
   defmodule JetExt.Absinthe.OneOf.SchemaProtoType do
     @moduledoc """
+    The homemade `one_of` directive.
+
     ## 使用方法
     在你的 schema 中添加下面代码：
     ```elixir

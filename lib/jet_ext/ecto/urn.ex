@@ -1,9 +1,9 @@
 if Code.ensure_loaded?(URN) do
   defmodule JetExt.Ecto.URN do
     @moduledoc """
-      An Ecto type for URN ([RFC 8141](https://tools.ietf.org/html/rfc8141))
+    An Ecto type for URN ([RFC 8141](https://tools.ietf.org/html/rfc8141))
 
-      ## Examples
+    ## Examples
 
         # cast
         iex> cast("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:userName")

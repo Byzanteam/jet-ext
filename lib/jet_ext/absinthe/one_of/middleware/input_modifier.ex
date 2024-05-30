@@ -1,6 +1,8 @@
 if Code.ensure_loaded?(Absinthe) do
   defmodule JetExt.Absinthe.OneOf.Middleware.InputModifier do
     @moduledoc """
+    Modify the input object.
+
     ## 使用方法
     ```elixir
     defmodule MyApp.GraphQL.Schema.Admin do
@@ -70,7 +72,7 @@ if Code.ensure_loaded?(Absinthe) do
         # }
       end
     end
-    ``
+    ```
     """
 
     @behaviour Absinthe.Middleware

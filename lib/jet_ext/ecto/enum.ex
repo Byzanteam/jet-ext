@@ -27,23 +27,23 @@ defmodule JetExt.Ecto.Enum do
     end
     ```
 
-    # cast
-    iex> EnumType.cast("foo")
-    {:ok, :foo}
-    iex> EnumType.cast("FOO")
-    {:ok, :foo}
-    iex> EnumType.cast(:foo)
-    {:ok, :foo}
+      # cast
+      iex> EnumType.cast("foo")
+      {:ok, :foo}
+      iex> EnumType.cast("FOO")
+      {:ok, :foo}
+      iex> EnumType.cast(:foo)
+      {:ok, :foo}
 
-    # load
-    iex> EnumType.load("foo")
-    {:ok, :foo}
-    iex> EnumType.load("FOO")
-    {:ok, :foo}
+      # load
+      iex> EnumType.load("foo")
+      {:ok, :foo}
+      iex> EnumType.load("FOO")
+      {:ok, :foo}
 
-    # dump
-    iex> EnumType.dump(:foo)
-    {:ok, "FOO"}
+      # dump
+      iex> EnumType.dump(:foo)
+      {:ok, "FOO"}
   """
 
   use Ecto.ParameterizedType
