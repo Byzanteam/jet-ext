@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Absinthe.Relay) do
+if Code.ensure_loaded?(Absinthe.Relay) do
   defmodule JetExt.Absinthe.NotationBuilder do
     @moduledoc false
 

@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Absinthe) do
+if Code.ensure_loaded?(Absinthe.Relay) do
   defmodule JetExt.Absinthe.Relay.Node.Notation do
     @moduledoc """
     Macros used to define Node-related schema entities

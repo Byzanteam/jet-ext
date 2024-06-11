@@ -1,221 +1,225 @@
-defmodule JetExt.Absinthe.Relay.Connection.Query do
-  @moduledoc false
+if Code.ensure_loaded?(Absinthe.Relay) do
+  defmodule JetExt.Absinthe.Relay.Connection.Query do
+    @moduledoc false
 
-  import Ecto.Query
+    import Ecto.Query
 
-  alias JetExt.Absinthe.Relay.Connection.Config
+    alias JetExt.Absinthe.Relay.Connection.Config
 
-  @spec paginate(Ecto.Queryable.t(), Config.t()) :: Ecto.Queryable.t()
-  def paginate(queryable, %Config{} = config) do
-    get_type = fn field ->
-      JetExt.Absinthe.Relay.Connection.FieldType.get_type(queryable, field)
+    @spec paginate(Ecto.Queryable.t(), Config.t()) :: Ecto.Queryable.t()
+    def paginate(queryable, %Config{} = config) do
+      get_type = fn field ->
+        JetExt.Absinthe.Relay.Connection.FieldType.get_type(queryable, field)
+      end
+
+      queryable
+      |> select_merge([q], ^typed_select(config.cursor_fields, get_type))
+      |> order_query(config)
+      |> maybe_where(config, get_type)
+      |> limit(^query_limit(config))
     end
 
-    queryable
-    |> select_merge([q], ^typed_select(config.cursor_fields, get_type))
-    |> order_query(config)
-    |> maybe_where(config, get_type)
-    |> limit(^query_limit(config))
-  end
-
-  defp typed_select(cursor_fields, get_type) do
-    Map.new(cursor_fields, fn {field, _value} ->
-      type = get_type.(field)
-
-      {field, dynamic([q], type(field(q, ^field), ^type))}
-    end)
-  end
-
-  defp maybe_where(query, %Config{after: nil, before: nil}, _get_type) do
-    query
-  end
-
-  defp maybe_where(
-         query,
-         %Config{
-           after: after_values,
-           before: nil,
-           cursor_fields: cursor_fields
-         } = config,
-         get_type
-       ) do
-    after_values = typed_cursor(after_values, get_type)
-
-    {condition, side_edge_condition} = filter_values(cursor_fields, after_values, :after, config)
-    wheres = or_join_dynamics([side_edge_condition, condition])
-
-    from(query, where: ^wheres)
-  end
-
-  defp maybe_where(
-         query,
-         %Config{
-           after: nil,
-           before: before_values,
-           cursor_fields: cursor_fields
-         } = config,
-         get_type
-       ) do
-    before_values = typed_cursor(before_values, get_type)
-
-    {condition, side_edge_condition} =
-      filter_values(cursor_fields, before_values, :before, config)
-
-    wheres = or_join_dynamics([side_edge_condition, condition])
-
-    from(query, where: ^wheres)
-  end
-
-  defp maybe_where(
-         query,
-         %Config{
-           after: after_values,
-           before: before_values,
-           cursor_fields: cursor_fields
-         } = config,
-         get_type
-       ) do
-    before_values = typed_cursor(before_values, get_type)
-    after_values = typed_cursor(after_values, get_type)
-
-    {after_condition, head_edge_condition} =
-      filter_values(cursor_fields, after_values, :after, config)
-
-    {before_condition, tail_edge_condition} =
-      filter_values(cursor_fields, before_values, :before, config)
-
-    conditions = and_join_dynamics([after_condition, before_condition])
-
-    wheres = or_join_dynamics([head_edge_condition, tail_edge_condition, conditions])
-
-    from(query, where: ^wheres)
-  end
-
-  defp typed_cursor(cursor, get_type) do
-    Map.new(cursor, fn {field, value} ->
-      # ensure that use is_nil(term) in wheres for nil values
-      if is_nil(value) do
-        {field, nil}
-      else
+    defp typed_select(cursor_fields, get_type) do
+      Map.new(cursor_fields, fn {field, _value} ->
         type = get_type.(field)
-        {field, dynamic([q], type(^value, ^type))}
-      end
-    end)
-  end
 
-  defp get_operator("asc" <> _tail, :before), do: :lt
-  defp get_operator("desc" <> _tail, :before), do: :gt
-  defp get_operator("asc" <> _tail, :after), do: :gt
-  defp get_operator("desc" <> _tail, :after), do: :lt
+        {field, dynamic([q], type(field(q, ^field), ^type))}
+      end)
+    end
 
-  defp get_operator(direction, _cursor),
-    do:
-      raise("""
-      Invalid sorting value :#{direction},
-      please use :asc, :asc_nulls_last, :asc_nulls_first, :desc, :desc_nulls_last, :desc_nulls_first
-      """)
+    defp maybe_where(query, %Config{after: nil, before: nil}, _get_type) do
+      query
+    end
 
-  defp get_operator_for_field(cursor_fields, key, direction) do
-    cursor_fields
-    |> Enum.find_value(fn {field_key, order} ->
-      if field_key === key, do: Atom.to_string(order)
-    end)
-    |> get_operator(direction)
-  end
+    defp maybe_where(
+           query,
+           %Config{
+             after: after_values,
+             before: nil,
+             cursor_fields: cursor_fields
+           } = config,
+           get_type
+         ) do
+      after_values = typed_cursor(after_values, get_type)
 
-  defp filter_values(cursor_fields, values, cursor_direction, config) do
-    # keep the order with order_by in `order_query/2`
-    sorts =
-      cursor_fields
-      |> Enum.reduce([], fn {field, _direction}, acc ->
-        case Map.fetch(values, field) do
-          :error -> acc
-          {:ok, nil} -> acc
-          {:ok, value} -> [{field, value} | acc]
+      {condition, side_edge_condition} =
+        filter_values(cursor_fields, after_values, :after, config)
+
+      wheres = or_join_dynamics([side_edge_condition, condition])
+
+      from(query, where: ^wheres)
+    end
+
+    defp maybe_where(
+           query,
+           %Config{
+             after: nil,
+             before: before_values,
+             cursor_fields: cursor_fields
+           } = config,
+           get_type
+         ) do
+      before_values = typed_cursor(before_values, get_type)
+
+      {condition, side_edge_condition} =
+        filter_values(cursor_fields, before_values, :before, config)
+
+      wheres = or_join_dynamics([side_edge_condition, condition])
+
+      from(query, where: ^wheres)
+    end
+
+    defp maybe_where(
+           query,
+           %Config{
+             after: after_values,
+             before: before_values,
+             cursor_fields: cursor_fields
+           } = config,
+           get_type
+         ) do
+      before_values = typed_cursor(before_values, get_type)
+      after_values = typed_cursor(after_values, get_type)
+
+      {after_condition, head_edge_condition} =
+        filter_values(cursor_fields, after_values, :after, config)
+
+      {before_condition, tail_edge_condition} =
+        filter_values(cursor_fields, before_values, :before, config)
+
+      conditions = and_join_dynamics([after_condition, before_condition])
+
+      wheres = or_join_dynamics([head_edge_condition, tail_edge_condition, conditions])
+
+      from(query, where: ^wheres)
+    end
+
+    defp typed_cursor(cursor, get_type) do
+      Map.new(cursor, fn {field, value} ->
+        # ensure that use is_nil(term) in wheres for nil values
+        if is_nil(value) do
+          {field, nil}
+        else
+          type = get_type.(field)
+          {field, dynamic([q], type(^value, ^type))}
         end
       end)
-      |> Enum.reverse()
+    end
 
-    conditions =
-      sorts
-      |> Enum.with_index()
-      |> Enum.map(fn {{column, value}, i} ->
-        field_dynamic =
-          case get_operator_for_field(cursor_fields, column, cursor_direction) do
-            :lt -> dynamic([q], field(q, ^column) < ^value)
-            :gt -> dynamic([q], field(q, ^column) > ^value)
-          end
+    defp get_operator("asc" <> _tail, :before), do: :lt
+    defp get_operator("desc" <> _tail, :before), do: :gt
+    defp get_operator("asc" <> _tail, :after), do: :gt
+    defp get_operator("desc" <> _tail, :after), do: :lt
 
-        prev_dynamics =
-          sorts
-          |> Enum.take(i)
-          |> Enum.map(fn {prev_column, prev_value} ->
-            dynamic([q], field(q, ^prev_column) == ^prev_value)
-          end)
+    defp get_operator(direction, _cursor),
+      do:
+        raise("""
+        Invalid sorting value :#{direction},
+        please use :asc, :asc_nulls_last, :asc_nulls_first, :desc, :desc_nulls_last, :desc_nulls_first
+        """)
 
-        and_join_dynamics([field_dynamic | prev_dynamics])
+    defp get_operator_for_field(cursor_fields, key, direction) do
+      cursor_fields
+      |> Enum.find_value(fn {field_key, order} ->
+        if field_key === key, do: Atom.to_string(order)
       end)
-      |> or_join_dynamics()
+      |> get_operator(direction)
+    end
 
-    # note: side edges should take `nil` values into account
-    {conditions, build_side_edge_condition(cursor_direction, config, values)}
-  end
+    defp filter_values(cursor_fields, values, cursor_direction, config) do
+      # keep the order with order_by in `order_query/2`
+      sorts =
+        cursor_fields
+        |> Enum.reduce([], fn {field, _direction}, acc ->
+          case Map.fetch(values, field) do
+            :error -> acc
+            {:ok, nil} -> acc
+            {:ok, value} -> [{field, value} | acc]
+          end
+        end)
+        |> Enum.reverse()
 
-  defp build_side_edge_condition(:after, %{include_head_edge: true}, values),
-    do: build_side_edge_condition(values)
+      conditions =
+        sorts
+        |> Enum.with_index()
+        |> Enum.map(fn {{column, value}, i} ->
+          field_dynamic =
+            case get_operator_for_field(cursor_fields, column, cursor_direction) do
+              :lt -> dynamic([q], field(q, ^column) < ^value)
+              :gt -> dynamic([q], field(q, ^column) > ^value)
+            end
 
-  defp build_side_edge_condition(:before, %{include_tail_edge: true}, values),
-    do: build_side_edge_condition(values)
+          prev_dynamics =
+            sorts
+            |> Enum.take(i)
+            |> Enum.map(fn {prev_column, prev_value} ->
+              dynamic([q], field(q, ^prev_column) == ^prev_value)
+            end)
 
-  defp build_side_edge_condition(_cursor_direction, _config, _values), do: false
+          and_join_dynamics([field_dynamic | prev_dynamics])
+        end)
+        |> or_join_dynamics()
 
-  defp build_side_edge_condition(values) when is_map(values) do
-    values
-    |> Enum.map(fn
-      {column, nil} -> dynamic([q], is_nil(field(q, ^column)))
-      {column, value} -> dynamic([q], field(q, ^column) == ^value)
-    end)
-    |> and_join_dynamics()
-  end
+      # note: side edges should take `nil` values into account
+      {conditions, build_side_edge_condition(cursor_direction, config, values)}
+    end
 
-  defp and_join_dynamics(conditions, acc \\ true)
-  defp and_join_dynamics([], acc), do: acc
-  defp and_join_dynamics([true | rest], acc), do: and_join_dynamics(rest, acc)
-  defp and_join_dynamics([first | rest], true), do: and_join_dynamics(rest, first)
+    defp build_side_edge_condition(:after, %{include_head_edge: true}, values),
+      do: build_side_edge_condition(values)
 
-  defp and_join_dynamics([first | rest], acc),
-    do: and_join_dynamics(rest, dynamic([q], ^acc and ^first))
+    defp build_side_edge_condition(:before, %{include_tail_edge: true}, values),
+      do: build_side_edge_condition(values)
 
-  defp or_join_dynamics(conditions, acc \\ false)
-  defp or_join_dynamics([], acc), do: acc
-  defp or_join_dynamics([false | rest], acc), do: or_join_dynamics(rest, acc)
-  defp or_join_dynamics([first | rest], false), do: or_join_dynamics(rest, first)
+    defp build_side_edge_condition(_cursor_direction, _config, _values), do: false
 
-  defp or_join_dynamics([first | rest], acc),
-    do: or_join_dynamics(rest, dynamic([q], ^acc or ^first))
+    defp build_side_edge_condition(values) when is_map(values) do
+      values
+      |> Enum.map(fn
+        {column, nil} -> dynamic([q], is_nil(field(q, ^column)))
+        {column, value} -> dynamic([q], field(q, ^column) == ^value)
+      end)
+      |> and_join_dynamics()
+    end
 
-  # In order to return the correct pagination cursors, we need to fetch one more
-  # record than we actually want to return.
-  defp query_limit(%Config{limit: limit}) do
-    limit + 1
-  end
+    defp and_join_dynamics(conditions, acc \\ true)
+    defp and_join_dynamics([], acc), do: acc
+    defp and_join_dynamics([true | rest], acc), do: and_join_dynamics(rest, acc)
+    defp and_join_dynamics([first | rest], true), do: and_join_dynamics(rest, first)
 
-  defp order_query(query, %Config{direction: :forward} = config) do
-    do_order_query(query, config)
-  end
+    defp and_join_dynamics([first | rest], acc),
+      do: and_join_dynamics(rest, dynamic([q], ^acc and ^first))
 
-  defp order_query(query, %Config{direction: :backward} = config) do
-    query |> do_order_query(config) |> reverse_order()
-  end
+    defp or_join_dynamics(conditions, acc \\ false)
+    defp or_join_dynamics([], acc), do: acc
+    defp or_join_dynamics([false | rest], acc), do: or_join_dynamics(rest, acc)
+    defp or_join_dynamics([first | rest], false), do: or_join_dynamics(rest, first)
 
-  defp do_order_query(query, %Config{cursor_fields: cursor_fields}) do
-    bindings =
-      for {field, direction} <- cursor_fields do
-        {direction, field}
-      end
+    defp or_join_dynamics([first | rest], acc),
+      do: or_join_dynamics(rest, dynamic([q], ^acc or ^first))
 
-    query
-    |> exclude(:order_by)
-    |> order_by(^bindings)
+    # In order to return the correct pagination cursors, we need to fetch one more
+    # record than we actually want to return.
+    defp query_limit(%Config{limit: limit}) do
+      limit + 1
+    end
+
+    defp order_query(query, %Config{direction: :forward} = config) do
+      do_order_query(query, config)
+    end
+
+    defp order_query(query, %Config{direction: :backward} = config) do
+      query |> do_order_query(config) |> reverse_order()
+    end
+
+    defp do_order_query(query, %Config{cursor_fields: cursor_fields}) do
+      bindings =
+        for {field, direction} <- cursor_fields do
+          {direction, field}
+        end
+
+      query
+      |> exclude(:order_by)
+      |> order_by(^bindings)
+    end
   end
 end
