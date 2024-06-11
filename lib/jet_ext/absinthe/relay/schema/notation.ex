@@ -1,124 +1,126 @@
-defmodule JetExt.Absinthe.Relay.Schema.Notation do
-  @moduledoc """
-  Used to extend a module where Absinthe types are defined with
-  Relay-specific macros and types.
+if Code.ensure_loaded?(Absinthe.Relay) do
+  defmodule JetExt.Absinthe.Relay.Schema.Notation do
+    @moduledoc """
+    Used to extend a module where Absinthe types are defined with
+    Relay-specific macros and types.
 
-  See `Absinthe.Relay`.
-  """
+    See `Absinthe.Relay`.
+    """
 
-  @typedoc "A valid flavor"
-  @type flavor :: :classic | :modern
+    @typedoc "A valid flavor"
+    @type flavor :: :classic | :modern
 
-  @valid_flavors [:classic, :modern]
+    @valid_flavors [:classic, :modern]
 
-  @default_flavor :classic
+    @default_flavor :classic
 
-  @flavor_namespaces [
-    modern: Modern,
-    classic: Classic
-  ]
-
-  defmacro __using__(flavor) when flavor in @valid_flavors do
-    notations(flavor)
-  end
-
-  defmacro __using__([]) do
-    [
-      quote do
-        warning = """
-        Defaulting to :classic as the flavor of Relay to target. \
-        Note this defaulting behavior will change to :modern in absinthe_relay v1.5. \
-        To prevent seeing this notice in the meantime, explicitly provide :classic \
-        or :modern as an option when you use Absinthe.Relay.Schema or \
-        Absinthe.Relay.Schema.Notation. See the Absinthe.Relay @moduledoc \
-        for more information. \
-        """
-
-        IO.warn(warning)
-      end,
-      notations(@default_flavor)
+    @flavor_namespaces [
+      modern: Modern,
+      classic: Classic
     ]
-  end
 
-  @spec notations(flavor) :: Macro.t()
-  defp notations(flavor) do
-    mutation_notation = flavored(Absinthe.Relay.Mutation.Notation, flavor)
-
-    quote do
-      import JetExt.Absinthe.Relay.Node.Notation, only: :macros
-      import Absinthe.Relay.Node.Helpers
-      import Absinthe.Relay.Connection.Notation, only: :macros
-      import unquote(mutation_notation), only: :macros
+    defmacro __using__(flavor) when flavor in @valid_flavors do
+      notations(flavor)
     end
-  end
 
-  @spec flavored(module, flavor) :: module
-  defp flavored(module, flavor) do
-    Module.safe_concat(module, Keyword.fetch!(@flavor_namespaces, flavor))
-  end
+    defmacro __using__([]) do
+      [
+        quote do
+          warning = """
+          Defaulting to :classic as the flavor of Relay to target. \
+          Note this defaulting behavior will change to :modern in absinthe_relay v1.5. \
+          To prevent seeing this notice in the meantime, explicitly provide :classic \
+          or :modern as an option when you use Absinthe.Relay.Schema or \
+          Absinthe.Relay.Schema.Notation. See the Absinthe.Relay @moduledoc \
+          for more information. \
+          """
 
-  @doc false
-  # credo:disable-for-next-line Credo.Check.Readability.Specs
-  def input(style, identifier, block) do
-    quote do
-      # We need to go up 2 levels so we can create the input object
-      Absinthe.Schema.Notation.stash()
-      Absinthe.Schema.Notation.stash()
+          IO.warn(warning)
+        end,
+        notations(@default_flavor)
+      ]
+    end
 
-      input_object unquote(identifier) do
-        private(:absinthe_relay, :input, {:fill, unquote(style)})
-        unquote(block)
+    @spec notations(flavor) :: Macro.t()
+    defp notations(flavor) do
+      mutation_notation = flavored(Absinthe.Relay.Mutation.Notation, flavor)
+
+      quote do
+        import JetExt.Absinthe.Relay.Node.Notation, only: :macros
+        import Absinthe.Relay.Node.Helpers
+        import Absinthe.Relay.Connection.Notation, only: :macros
+        import unquote(mutation_notation), only: :macros
       end
-
-      # Back down to finish the field
-      Absinthe.Schema.Notation.pop()
-      Absinthe.Schema.Notation.pop()
     end
-  end
 
-  @doc false
-  # credo:disable-for-next-line Credo.Check.Readability.Specs
-  def output(style, identifier, block) do
-    quote do
-      Absinthe.Schema.Notation.stash()
-      Absinthe.Schema.Notation.stash()
+    @spec flavored(module, flavor) :: module
+    defp flavored(module, flavor) do
+      Module.safe_concat(module, Keyword.fetch!(@flavor_namespaces, flavor))
+    end
 
-      object unquote(identifier) do
-        private(:absinthe_relay, :payload, {:fill, unquote(style)})
-        unquote(block)
+    @doc false
+    # credo:disable-for-next-line Credo.Check.Readability.Specs
+    def input(style, identifier, block) do
+      quote do
+        # We need to go up 2 levels so we can create the input object
+        Absinthe.Schema.Notation.stash()
+        Absinthe.Schema.Notation.stash()
+
+        input_object unquote(identifier) do
+          private(:absinthe_relay, :input, {:fill, unquote(style)})
+          unquote(block)
+        end
+
+        # Back down to finish the field
+        Absinthe.Schema.Notation.pop()
+        Absinthe.Schema.Notation.pop()
       end
-
-      Absinthe.Schema.Notation.pop()
-      Absinthe.Schema.Notation.pop()
     end
-  end
 
-  @doc false
-  # credo:disable-for-next-line Credo.Check.Readability.Specs
-  def payload(meta, [field_ident | rest], block) do
-    block = rewrite_input_output(field_ident, block)
+    @doc false
+    # credo:disable-for-next-line Credo.Check.Readability.Specs
+    def output(style, identifier, block) do
+      quote do
+        Absinthe.Schema.Notation.stash()
+        Absinthe.Schema.Notation.stash()
 
-    # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
-    {:field, meta, [field_ident, ident(field_ident, :payload) | rest] ++ [[do: block]]}
-  end
+        object unquote(identifier) do
+          private(:absinthe_relay, :payload, {:fill, unquote(style)})
+          unquote(block)
+        end
 
-  defp rewrite_input_output(field_ident, block) do
-    Macro.prewalk(block, fn
-      {:input, meta, [[do: block]]} ->
-        {:input, meta, [ident(field_ident, :input), [do: block]]}
+        Absinthe.Schema.Notation.pop()
+        Absinthe.Schema.Notation.pop()
+      end
+    end
 
-      {:output, meta, [[do: block]]} ->
-        {:output, meta, [ident(field_ident, :payload), [do: block]]}
+    @doc false
+    # credo:disable-for-next-line Credo.Check.Readability.Specs
+    def payload(meta, [field_ident | rest], block) do
+      block = rewrite_input_output(field_ident, block)
 
-      node ->
-        node
-    end)
-  end
+      # credo:disable-for-next-line Credo.Check.Refactor.AppendSingleItem
+      {:field, meta, [field_ident, ident(field_ident, :payload) | rest] ++ [[do: block]]}
+    end
 
-  @doc false
-  # credo:disable-for-next-line Credo.Check.Readability.Specs
-  def ident(base_identifier, category) do
-    # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
-    :"#{base_identifier}_#{category}"
+    defp rewrite_input_output(field_ident, block) do
+      Macro.prewalk(block, fn
+        {:input, meta, [[do: block]]} ->
+          {:input, meta, [ident(field_ident, :input), [do: block]]}
+
+        {:output, meta, [[do: block]]} ->
+          {:output, meta, [ident(field_ident, :payload), [do: block]]}
+
+        node ->
+          node
+      end)
+    end
+
+    @doc false
+    # credo:disable-for-next-line Credo.Check.Readability.Specs
+    def ident(base_identifier, category) do
+      # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
+      :"#{base_identifier}_#{category}"
+    end
   end
 end

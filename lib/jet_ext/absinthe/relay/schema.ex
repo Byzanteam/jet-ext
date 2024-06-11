@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Absinthe.Relay) do
+if Code.ensure_loaded?(Absinthe.Relay) do
   defmodule JetExt.Absinthe.Relay.Schema do
     @moduledoc """
     Used to extend a schema with Relay-specific macros and types.
