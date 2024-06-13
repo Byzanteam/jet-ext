@@ -7,8 +7,6 @@ defmodule JetExt.Ecto.Schemaless.Query do
 
   alias JetExt.Ecto.Schemaless.Schema
 
-  @type filter() :: nil | {:is_not, term()} | {:in, [term()]} | term()
-
   typedstruct do
     field :schema, Schema.t(), enforce: true
     field :query, Ecto.Query.t()
