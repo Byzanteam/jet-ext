@@ -47,19 +47,13 @@ defmodule JetExt.Ecto.Schemaless.Schema do
     }
   end
 
-  @spec changeset(t(), data :: map(), params :: map(), permitted :: nil | [atom()]) ::
-          Ecto.Changeset.t(row())
-  def changeset(%__MODULE__{} = schema, data \\ %{}, params, permitted \\ nil) do
-    permitted = permitted || Map.keys(schema.types)
-
-    # https://www.notion.so/byzanteam/Form-Metal-1959b7eda1d34f349d2106a9f9838844?pvs=4#f39c5c2599e8477e9c6fb2049b102a18
-    Ecto.Changeset.cast({data, schema.types}, params, permitted,
-      empty_values: [[] | Ecto.Changeset.empty_values()]
-    )
+  @spec changeset(t(), data :: map()) :: Ecto.Changeset.t(row())
+  def changeset(%__MODULE__{} = schema, data \\ %{}) do
+    Ecto.Changeset.change({data, schema.types})
   end
 
-  @spec load(t(), data :: map()) :: row()
-  def load(%__MODULE__{} = schema, data) do
+  @spec load!(t(), data :: map()) :: row()
+  def load!(%__MODULE__{} = schema, data) do
     Map.new(schema.types, fn {field, type} ->
       value = JetExt.Map.indifferent_get(data, field)
       {:ok, value} = Ecto.Type.load(type, value)
@@ -67,8 +61,8 @@ defmodule JetExt.Ecto.Schemaless.Schema do
     end)
   end
 
-  @spec dump(t(), row()) :: map()
-  def dump(%__MODULE__{} = schema, row) do
+  @spec dump!(t(), row()) :: map()
+  def dump!(%__MODULE__{} = schema, row) do
     Map.new(schema.types, fn {field, type} ->
       value = Map.get(row, field)
       {:ok, value} = Ecto.Type.dump(type, value)

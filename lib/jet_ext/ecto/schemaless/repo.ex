@@ -77,7 +77,7 @@ defmodule JetExt.Ecto.Schemaless.Repo do
 
   defp build_insertion(schema, row) do
     schema
-    |> Schema.dump(row)
+    |> Schema.dump!(row)
     |> Stream.reject(fn {_key, value} -> is_nil(value) end)
     |> Map.new()
   end
@@ -145,15 +145,17 @@ defmodule JetExt.Ecto.Schemaless.Repo do
     end)
   end
 
-  defp to_constraints(%Postgrex.Error{
-         postgres: %{code: :unique_violation, constraint: constraint}
-       }),
-       do: [unique: constraint]
+  if Code.ensure_loaded?(Postgrex) do
+    defp to_constraints(%Postgrex.Error{
+           postgres: %{code: :unique_violation, constraint: constraint}
+         }),
+         do: [unique: constraint]
 
-  defp to_constraints(%Postgrex.Error{
-         postgres: %{code: :foreign_key_violation, constraint: constraint}
-       }),
-       do: [foreign_key: constraint]
+    defp to_constraints(%Postgrex.Error{
+           postgres: %{code: :foreign_key_violation, constraint: constraint}
+         }),
+         do: [foreign_key: constraint]
+  end
 
   defp to_constraints(_error), do: []
 end

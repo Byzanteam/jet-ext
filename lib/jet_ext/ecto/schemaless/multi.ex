@@ -88,7 +88,7 @@ defmodule JetExt.Ecto.Schemaless.Multi do
     row = Schema.autogenerate_changes(schema, Map.put(row, :action, :insert))
 
     schema
-    |> Schema.dump(Ecto.Changeset.apply_changes(row))
+    |> Schema.dump!(Ecto.Changeset.apply_changes(row))
     |> Stream.reject(fn {_key, value} -> is_nil(value) end)
     |> Map.new()
   end

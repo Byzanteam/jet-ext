@@ -133,15 +133,17 @@ defmodule JetExt.Ecto.Schemaless.Query do
     end
   end
 
-  defimpl JetExt.Absinthe.Relay.Connection.FieldType do
-    # credo:disable-for-next-line Credo.Check.Readability.Specs
-    def get_type(query, field) do
-      case Map.fetch(query.schema.types, field) do
-        {:ok, type} ->
-          type
+  if Code.ensure_loaded?(Absinthe.Relay) do
+    defimpl JetExt.Absinthe.Relay.Connection.FieldType do
+      # credo:disable-for-next-line Credo.Check.Readability.Specs
+      def get_type(query, field) do
+        case Map.fetch(query.schema.types, field) do
+          {:ok, type} ->
+            type
 
-        :error ->
-          raise "Field #{inspect(field)} not found in schema #{inspect(query.schema)}"
+          :error ->
+            raise "Field #{inspect(field)} not found in schema #{inspect(query.schema)}"
+        end
       end
     end
   end
