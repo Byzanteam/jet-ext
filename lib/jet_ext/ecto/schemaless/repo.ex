@@ -111,7 +111,19 @@ defmodule JetExt.Ecto.Schemaless.Repo do
   end
 
   defp query_by_pk(schema, row) do
-    schema |> Query.from() |> Query.where(Schema.primary_key(schema, row))
+    import Ecto.Query
+
+    schema
+    |> Query.from()
+    |> Query.update_ecto_query(fn query, schema ->
+      schema
+      |> Schema.primary_key(row)
+      |> Enum.reduce(query, fn {field, value}, acc ->
+        type = Map.fetch!(schema.types, field)
+        condition = dynamic([q], field(q, ^field) == type(^value, ^type))
+        where(acc, ^condition)
+      end)
+    end)
   end
 
   defp constraints_to_errors(constraint_definitions, changeset, constraints) do
