@@ -3,6 +3,9 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
     @moduledoc """
     The default error handler for `JetExt.Absinthe.Middleware.HandleError` that handles ecto
     changeset as an error.
+
+    If the `PolymorphicEmbed` module is loaded, it will use the `traverse_errors` function from it,
+    otherwise it will use the `traverse_errors` function from `Ecto.Changeset`.
     """
 
     @behaviour JetExt.Absinthe.ErrorHandler
@@ -18,7 +21,7 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
 
     def handle(%Ecto.Changeset{} = changeset) do
       changeset
-      |> Ecto.Changeset.traverse_errors(fn {message, options} ->
+      |> traverse_errors(fn {message, options} ->
         options
         |> Map.new()
         |> Map.put(:message, message)
@@ -30,5 +33,11 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
     end
 
     def handle(_error), do: :error
+
+    if Code.ensure_loaded?(PolymorphicEmbed) do
+      defp traverse_errors(changeset, fun), do: PolymorphicEmbed.traverse_errors(changeset, fun)
+    else
+      defp traverse_errors(changeset, fun), do: Ecto.Changeset.traverse_errors(changeset, fun)
+    end
   end
 end
