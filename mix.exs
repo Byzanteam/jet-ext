@@ -45,7 +45,8 @@ defmodule JetExt.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:jason, "~> 1.4"},
       {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:polymorphic_embed, "~> 4.1.1", only: :test}
     ]
   end
 

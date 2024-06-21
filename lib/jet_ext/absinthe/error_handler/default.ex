@@ -26,10 +26,7 @@ if Code.ensure_loaded?(Absinthe) and Code.ensure_loaded?(Ecto.Changeset) do
         |> Map.new()
         |> Map.put(:message, message)
       end)
-      |> Enum.flat_map(fn {field, errors} ->
-        Enum.map(errors, &Map.put(&1, :field, field))
-      end)
-      |> then(&{:ok, &1})
+      |> then(&{:ok, %{message: "Validation failed", details: &1}})
     end
 
     def handle(_error), do: :error
