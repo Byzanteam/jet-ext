@@ -63,11 +63,18 @@ defmodule JetExt.Ecto.Schemaless.Schema do
 
   @spec dump!(t(), row()) :: map()
   def dump!(%__MODULE__{} = schema, row) do
-    Map.new(schema.types, fn {field, type} ->
-      value = Map.get(row, field)
-      {:ok, value} = Ecto.Type.dump(type, value)
-      {field, value}
+    schema.types
+    |> Stream.flat_map(fn {field, type} ->
+      case Map.fetch(row, field) do
+        {:ok, value} ->
+          {:ok, value} = Ecto.Type.dump(type, value)
+          [{field, value}]
+
+        :error ->
+          []
+      end
     end)
+    |> Map.new()
   end
 
   @spec primary_key(t(), row() | Ecto.Changeset.t(row())) :: keyword()

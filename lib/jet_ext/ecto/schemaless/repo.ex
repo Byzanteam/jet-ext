@@ -61,10 +61,7 @@ defmodule JetExt.Ecto.Schemaless.Repo do
           |> Schema.autogenerate_changes(changeset)
           |> Ecto.Changeset.apply_changes()
 
-        schema
-        |> Schema.dump!(values)
-        |> Map.reject(fn {_key, value} -> is_nil(value) end)
-        |> then(&{:ok, &1})
+        {:ok, Schema.dump!(schema, values)}
 
       %Ecto.Changeset{valid?: false} = changeset ->
         {:error, changeset}
