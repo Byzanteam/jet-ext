@@ -4,7 +4,7 @@ defmodule JetExt.MixProject do
   def project do
     [
       app: :jet_ext,
-      version: "0.2.3",
+      version: "0.2.2",
       elixir: "~> 1.14",
       description: "The extended tools for the Jet Team.",
       source_url: "https://github.com/Byzanteam/jet-ext",
