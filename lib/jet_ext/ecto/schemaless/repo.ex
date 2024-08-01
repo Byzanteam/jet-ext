@@ -6,6 +6,8 @@ defmodule JetExt.Ecto.Schemaless.Repo do
 
   @type row() :: map()
 
+  @typep result() :: {non_neg_integer(), nil | [term()]}
+
   @spec insert(Ecto.Repo.t(), Schema.t(), row() | changeset, options :: keyword()) ::
           {:ok, row()} | {:error, changeset | term()}
         when changeset: Ecto.Changeset.t(row())
@@ -13,6 +15,57 @@ defmodule JetExt.Ecto.Schemaless.Repo do
 
   def insert(repo, schema, %Ecto.Changeset{} = changeset, options) do
     apply_action(:insert, repo, schema, changeset, options)
+  end
+
+  @spec insert_all(
+          repo :: Ecto.Repo.t(),
+          schema :: Schema.t(),
+          entries :: [map()],
+          opts :: keyword()
+        ) :: {:ok, result()} | {:error, Ecto.Changeset.t()}
+  def insert_all(repo, schema, entries, opts \\ []) do
+    options =
+      case schema.prefix do
+        nil -> opts
+        prefix -> Keyword.put_new(opts, :prefix, prefix)
+      end
+
+    with {:ok, rows} <- build_rows(schema, entries) do
+      {:ok, repo.insert_all(schema.source, rows, options)}
+    end
+  end
+
+  defp build_rows(schema, entries) do
+    entries
+    |> Enum.reduce_while({:ok, []}, fn entry, {:ok, acc} ->
+      case build_row(schema, entry) do
+        {:ok, values} -> {:cont, {:ok, [values | acc]}}
+        {:error, changeset} -> {:halt, {:error, changeset}}
+      end
+    end)
+    |> case do
+      {:ok, rows} -> {:ok, Enum.reverse(rows)}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp build_row(schema, entry) do
+    schema
+    |> Schema.changeset()
+    |> Ecto.Changeset.cast(entry, Map.keys(schema.types))
+    |> Map.put(:action, :insert)
+    |> case do
+      %Ecto.Changeset{valid?: true} = changeset ->
+        values =
+          schema
+          |> Schema.autogenerate_changes(changeset)
+          |> Ecto.Changeset.apply_changes()
+
+        {:ok, Schema.dump!(schema, values)}
+
+      %Ecto.Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+    end
   end
 
   @spec update(Ecto.Repo.t(), Schema.t(), changeset, options :: keyword()) ::
