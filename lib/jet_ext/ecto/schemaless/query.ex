@@ -12,6 +12,8 @@ defmodule JetExt.Ecto.Schemaless.Query do
     field :query, Ecto.Query.t()
   end
 
+  @typep field() :: atom() | {atom(), atom() | binary()}
+
   @spec from(t() | Schema.t()) :: t()
   def from(%__MODULE__{} = query) do
     query
@@ -21,25 +23,27 @@ defmodule JetExt.Ecto.Schemaless.Query do
     %__MODULE__{schema: schema}
   end
 
-  @spec select(t(), fields :: [atom()]) :: t()
+  @spec select(t(), fields :: [field()]) :: t()
   def select(%__MODULE__{} = query, fields) do
     update_ecto_query(query, &select(&1, query.schema, fields))
   end
 
-  @spec select(Ecto.Queryable.t(), Schema.t(), fields :: [atom()]) :: Ecto.Query.t()
+  @spec select(Ecto.Queryable.t(), Schema.t(), fields :: [field()]) :: Ecto.Query.t()
   def select(queryable, %Schema{} = schema, fields) do
     selects = select_map(fields, schema.types)
     Ecto.Query.select(queryable, ^selects)
   end
 
   defp select_map(fields, types) do
-    Map.new(fields, fn field ->
-      type = Map.fetch!(types, field)
+    import Ecto.Query, only: [dynamic: 2]
 
-      {
-        field,
-        Ecto.Query.dynamic([q], type(field(q, ^field), ^type))
-      }
+    fields
+    |> Stream.map(fn
+      {field, name} -> {name, field, Map.fetch!(types, field)}
+      field -> {field, field, Map.fetch!(types, field)}
+    end)
+    |> Map.new(fn {name, field, type} ->
+      {name, dynamic([row], type(field(row, ^field), ^type))}
     end)
   end
 
