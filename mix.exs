@@ -38,7 +38,7 @@ defmodule JetExt.MixProject do
       {:absinthe, "~> 1.7", optional: true},
       {:absinthe_relay, "~> 1.5", optional: true},
       {:plug, "~> 1.14", optional: true},
-      {:postgrex, "~> 0.18.0", optional: true},
+      {:postgrex, ">= 0.0.0", optional: true},
       {:urn, "~> 1.0", optional: true},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
