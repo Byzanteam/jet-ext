@@ -30,7 +30,8 @@ defmodule JetExt.Ecto.VarcharTest do
                  grapheme_field:
                    {"is invalid",
                     [
-                      type: {:parameterized, JetExt.Ecto.Varchar, %{count: :graphemes, limit: 2}},
+                      type:
+                        {:parameterized, {JetExt.Ecto.Varchar, %{count: :graphemes, limit: 2}}},
                       count: 2,
                       validation: :length,
                       kind: :max
@@ -56,7 +57,7 @@ defmodule JetExt.Ecto.VarcharTest do
                  byte_field:
                    {"is invalid",
                     [
-                      type: {:parameterized, JetExt.Ecto.Varchar, %{count: :bytes, limit: 3}},
+                      type: {:parameterized, {JetExt.Ecto.Varchar, %{count: :bytes, limit: 3}}},
                       count: 3,
                       validation: :length,
                       kind: :max

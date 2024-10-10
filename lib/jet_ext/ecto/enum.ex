@@ -8,13 +8,16 @@ defmodule JetExt.Ecto.Enum do
     iex> type = Ecto.ParameterizedType.init(JetExt.Ecto.Enum, values: [:foo, :bar])
     {
       :parameterized,
-      JetExt.Ecto.Enum,
-      %{
-        mappings: [foo: "foo", bar: "bar"],
-        on_cast: %{"FOO" => :foo, "BAR" => :bar, "foo" => :foo, "bar" => :bar},
-        on_dump: %{foo: "FOO", bar: "BAR"},
-        on_load: %{"FOO" => :foo, "BAR" => :bar},
-        type: :string
+      {
+        JetExt.Ecto.Enum,
+        %{
+          on_load: %{"BAR" => :bar, "FOO" => :foo},
+          type: :string,
+          on_cast: %{"BAR" => :bar, "FOO" => :foo, "bar" => :bar, "foo" => :foo},
+          embed_as: :self,
+          mappings: [foo: "foo", bar: "bar"],
+          on_dump: %{foo: "FOO", bar: "BAR"}
+        }
       }
     }
     ```
@@ -223,8 +226,8 @@ defmodule JetExt.Ecto.Enum do
     _exception in UndefinedFunctionError ->
       raise ArgumentError, "#{inspect(schema)} is not an Ecto schema"
   else
-    %{^field => {:parameterized, __MODULE__, %{^name => value}}} -> value
-    %{^field => {_, {:parameterized, __MODULE__, %{^name => value}}}} -> value
+    %{^field => {:parameterized, {__MODULE__, %{^name => value}}}} -> value
+    %{^field => {_, {:parameterized, {__MODULE__, %{^name => value}}}}} -> value
     %{^field => _} -> raise ArgumentError, "#{field} is not an #{__MODULE__} field"
     %{} -> raise ArgumentError, "#{field} does not exist"
   end
