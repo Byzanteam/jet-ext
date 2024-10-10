@@ -4,11 +4,7 @@ defmodule JetExt.Ecto.STITest do
   alias JetExt.Ecto.STI
   alias JetExt.Ecto.STI.Support.LSP
 
-  @ecto_type {
-    :parameterized,
-    STI,
-    STI.init(intermediate_module: LSP.IntermediateModule)
-  }
+  @ecto_type Ecto.ParameterizedType.init(STI, intermediate_module: LSP.IntermediateModule)
 
   describe "cast" do
     test "works" do
@@ -61,7 +57,15 @@ defmodule JetExt.Ecto.STITest do
                  }
                })
 
-      assert :error ===
+      assert {
+               :error,
+               [
+                 validation: :sti,
+                 sti_errors: %{type: [{"can't be blank", [validation: :required]}]},
+                 # https://github.com/elixir-ecto/ecto/pull/4382
+                 source: [0]
+               ]
+             } ===
                Ecto.Type.cast({:array, @ecto_type}, [
                  %{
                    settings: %{

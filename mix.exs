@@ -32,7 +32,7 @@ defmodule JetExt.MixProject do
 
   defp deps do
     [
-      {:ecto, ">= 3.9.5 and < 4.0.0"},
+      {:ecto, "~> 3.12"},
       {:jason, "~> 1.4"},
       {:typed_struct, "~> 0.3.0"},
       {:absinthe, "~> 1.7", optional: true},
@@ -43,9 +43,9 @@ defmodule JetExt.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
-      {:ecto_sql, "~> 3.11", only: :test},
+      {:ecto_sql, "~> 3.12", only: :test},
       {:mimic, "~> 1.7", only: :test},
-      {:polymorphic_embed, "~> 4.1.1", only: :test}
+      {:polymorphic_embed, "~> 5.0", only: :test}
     ]
   end
 

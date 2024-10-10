@@ -58,10 +58,10 @@ defmodule JetExt.Ecto.STI do
     _error in UndefinedFunctionError ->
       raise ArgumentError, "#{inspect(schema)} is not an Ecto schema"
   else
-    %{^field => {:parameterized, __MODULE__, %{intermediate_module: intermediate_module}}} ->
+    %{^field => {:parameterized, {__MODULE__, %{intermediate_module: intermediate_module}}}} ->
       intermediate_module
 
-    %{^field => {_, {:parameterized, __MODULE__, %{intermediate_module: intermediate_module}}}} ->
+    %{^field => {_, {:parameterized, {__MODULE__, %{intermediate_module: intermediate_module}}}}} ->
       intermediate_module
 
     %{^field => _} ->
